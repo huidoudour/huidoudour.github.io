@@ -330,31 +330,35 @@
     </div>
 
     <script>
-        // 仓库数据
+        // 仓库数据 - 只更新链接部分
         const repositories = [
             {
                 name: "Installer",
                 fullName: "huidoudour/Installer",
                 description: "一个安装工具项目，提供简单易用的软件安装解决方案。",
-                icon: "fas fa-download"
+                icon: "fas fa-download",
+                url: "https://app.ccrh-cmit.uno"
             },
             {
                 name: "Learn-of-all",
                 fullName: "huidoudour/Learn-of-all",
                 description: "综合性学习项目，涵盖多种技术和知识领域的学习资料和示例。",
-                icon: "fas fa-graduation-cap"
+                icon: "fas fa-graduation-cap",
+                url: "https://learn.ccrh-cmit.uno"
             },
             {
                 name: "huidoudour",
                 fullName: "huidoudour/huidoudour",
                 description: "个人仓库，包含配置文件、个人项目和工具集合。",
-                icon: "fas fa-user"
+                icon: "fas fa-user",
+                url: "https://me.ccrh-cmit.uno"
             },
             {
                 name: "LearnEuler",
                 fullName: "huidoudour/LearnEuler",
                 description: "欧拉计划(Project Euler)学习项目，包含多种编程语言的解题方案。",
-                icon: "fas fa-code"
+                icon: "fas fa-code",
+                url: "https://euler.ccrh-cmit.uno"
             }
         ];
 
@@ -373,8 +377,8 @@
                     </div>
                     <h3 class="repo-name">${repo.name}</h3>
                     <p class="repo-desc">${repo.description}</p>
-                    <a href="https://github.com/${repo.fullName}" target="_blank" class="repo-link">
-                        <i class="fab fa-github"></i> 访问仓库
+                    <a href="${repo.url}" target="_blank" class="repo-link">
+                        <i class="fab fa-github"></i> 访问仓库页面 
                     </a>
                 `;
                 
