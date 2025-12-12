@@ -29,29 +29,8 @@
       <a class="ghost" href="https://github.com/huidoudour">查看我的 GitHub</a>
     </p>
     <footer>
-      <div class="small">自动跳转：如果您是在本站内部路径（例如旧链接）访问，页面会在 <span id="count">8</span> 秒后跳转回首页。</div>
+      <div class="small">提示：如果您是在本站内部路径（例如旧链接）访问，请使用上方的“回到网站首页”按钮或手动导航。</div>
     </footer>
   </main>
-
-  <script>
-    // 倒计时并在 Pages 域名下自动跳回首页
-    (function(){
-      var countEl = document.getElementById('count');
-      var t = 8;
-      var interval = setInterval(function(){
-        t--;
-        if(countEl) countEl.textContent = t;
-        if(t<=0){ clearInterval(interval); window.location.href = '/'; }
-      }, 1000);
-
-      // 如果页面在 GitHub Pages 域名下并且路径看起来像 SPA 路由，尝试恢复到首页
-      try{
-        var host = location.hostname;
-        if(host && (host.endsWith('github.io') || host === 'huidoudour.github.io')){
-          // keep the countdown behaviour above
-        }
-      }catch(e){}
-    })();
-  </script>
 </body>
 </html>
