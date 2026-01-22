@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>huidoudour 博客</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="./css/blog.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="avatar">
+                <i class="fas fa-blog"></i>
+            </div>
+            <h1>huidoudour 的博客</h1>
+            <p class="subtitle">分享技术心得、生活感悟和学习笔记</p>
+            <a href="https://github.com/huidoudour" target="_blank" class="github-link">
+                <i class="fab fa-github"></i> 访问 GitHub 主页
+            </a>
+        </header>
+
+        <div class="nav-menu">
+            <a href="./index.html" class="nav-item">
+                <i class="fas fa-home"></i> 项目导航
+            </a>
+            <a href="./blog.html" class="nav-item">
+                <i class="fas fa-blog"></i> 博客首页
+            </a>
+        </div>
+
+        <div class="blog-layout">
+            <aside class="sidebar">
+                <div class="widget">
+                    <h3 class="widget-title">关于我</h3>
+                    <p>一名热爱技术的前端开发者，专注于Web技术的研究与实践，喜欢分享开发经验和心得。</p>
+                </div>
+
+                <div class="widget">
+                    <h3 class="widget-title">最新文章</h3>
+                    <ul class="recent-posts">
+                        <li><a href="#" class="recent-post-link">学习新技术的心路历程</a></li>
+                        <li><a href="#" class="recent-post-link">项目开发中的架构设计</a></li>
+                        <li><a href="#" class="recent-post-link">Git 使用技巧与工作流</a></li>
+                        <li><a href="#" class="recent-post-link">性能优化实战案例</a></li>
+                    </ul>
+                </div>
+
+                <div class="widget">
+                    <h3 class="widget-title">分类</h3>
+                    <ul class="categories">
+                        <li><a href="#" class="category-link">技术分享</a></li>
+                        <li><a href="#" class="category-link">学习笔记</a></li>
+                        <li><a href="#" class="category-link">项目经验</a></li>
+                        <li><a href="#" class="category-link">生活感悟</a></li>
+                    </ul>
+                </div>
+            </aside>
+
+            <main class="main-content">
+                <section class="blog-intro">
+                    <h2>欢迎来到我的博客</h2>
+                    <p>在这里我会分享技术文章、学习心得、项目经验以及生活感悟。每一篇文章都是我对某个主题的思考和总结，希望能对大家有所帮助。</p>
+                </section>
+
+                <div class="blog-posts" id="blogPosts">
+                    <!-- 博客文章将通过JavaScript动态生成 -->
+                </div>
+            </main>
+        </div>
+
+        <footer>
+            <p>© 2025 huidoudour 的博客 | 专注于技术分享与学习心得</p>
+            <p>最后更新: 2026-01-22</p>
+        </footer>
+    </div>
+
+    <script src="./js/blog.js"></script>
+</body>
+</html>
