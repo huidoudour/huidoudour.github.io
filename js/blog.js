@@ -134,50 +134,65 @@ if(commentForm) {
     });
 }
 
+// 文章数据集中管理
+const articlesData = [
+    {
+        title: "前端开发中的最佳实践",
+        date: "2026-01-15",
+        excerpt: "分享我在前端开发过程中积累的一些最佳实践和经验，包括代码组织、性能优化和用户体验等方面。良好的代码组织、性能优化策略和用户体验设计是构建高质量应用的关键要素。",
+        tags: ["前端开发", "最佳实践", "性能优化"],
+        url: "./articles/frontend-best-practices.html",
+        category: "技术分享"
+    },
+    {
+        title: "学习新技术的心路历程",
+        date: "2026-01-10",
+        excerpt: "记录我学习某项新技术的过程，从入门到实践，遇到的问题和解决方法，以及心得体会。学习新技术需要循序渐进，理论与实践相结合，不断总结和反思才能真正掌握。",
+        tags: ["学习方法", "技术成长", "心得体会"],
+        url: "./articles/learning-new-tech.html",
+        category: "学习笔记"
+    },
+    {
+        title: "项目开发中的架构设计",
+        date: "2025-12-28",
+        excerpt: "探讨在实际项目中如何进行合理的架构设计，保证项目的可维护性和扩展性。良好的架构设计是项目成功的基石，需要考虑多方面的因素。",
+        tags: ["架构设计", "项目经验", "可维护性"],
+        url: "#",
+        category: "项目经验"
+    },
+    {
+        title: "Git 使用技巧与工作流",
+        date: "2025-12-15",
+        excerpt: "介绍一些实用的 Git 技巧和高效的工作流程，提高团队协作效率。掌握 Git 不仅是版本控制的需要，更是团队协作的基础。",
+        tags: ["Git", "工作流", "团队协作"],
+        url: "#",
+        category: "技术分享"
+    },
+    {
+        title: "性能优化实战案例",
+        date: "2025-12-01",
+        excerpt: "通过实际案例分析网站性能问题，分享优化策略和具体实施步骤。性能优化需要从多个维度入手，包括网络、渲染、计算等方面。",
+        tags: ["性能优化", "实战案例", "Web性能"],
+        url: "#",
+        category: "技术分享"
+    }
+];
+
+// 获取指定数量的最新文章
+function getLatestArticles(count) {
+    return articlesData.slice(0, count);
+}
+
+// 获取指定类别的文章
+function getArticlesByCategory(category) {
+    return articlesData.filter(article => article.category === category);
+}
+
 // 如果是博客首页，加载博客文章列表
 const blogPostsContainer = document.getElementById('blogPosts');
 if(blogPostsContainer) {
-    // 博客文章数据
-    const blogPosts = [
-        {
-            title: "前端开发中的最佳实践",
-            date: "2026-01-15",
-            excerpt: "分享我在前端开发过程中积累的一些最佳实践和经验，包括代码组织、性能优化和用户体验等方面。良好的代码组织、性能优化策略和用户体验设计是构建高质量应用的关键要素。",
-            tags: ["前端开发", "最佳实践", "性能优化"],
-            url: "./post.html"
-        },
-        {
-            title: "学习新技术的心路历程",
-            date: "2026-01-10",
-            excerpt: "记录我学习某项新技术的过程，从入门到实践，遇到的问题和解决方法，以及心得体会。学习新技术需要循序渐进，理论与实践相结合，不断总结和反思才能真正掌握。",
-            tags: ["学习方法", "技术成长", "心得体会"],
-            url: "./post.html"
-        },
-        {
-            title: "项目开发中的架构设计",
-            date: "2025-12-28",
-            excerpt: "探讨在实际项目中如何进行合理的架构设计，保证项目的可维护性和扩展性。良好的架构设计是项目成功的基石，需要考虑多方面的因素。",
-            tags: ["架构设计", "项目经验", "可维护性"],
-            url: "./post.html"
-        },
-        {
-            title: "Git 使用技巧与工作流",
-            date: "2025-12-15",
-            excerpt: "介绍一些实用的 Git 技巧和高效的工作流程，提高团队协作效率。掌握 Git 不仅是版本控制的需要，更是团队协作的基础。",
-            tags: ["Git", "工作流", "团队协作"],
-            url: "./post.html"
-        },
-        {
-            title: "性能优化实战案例",
-            date: "2025-12-01",
-            excerpt: "通过实际案例分析网站性能问题，分享优化策略和具体实施步骤。性能优化需要从多个维度入手，包括网络、渲染、计算等方面。",
-            tags: ["性能优化", "实战案例", "Web性能"],
-            url: "./post.html"
-        }
-    ];
-    
     // 生成博客文章
-    blogPosts.forEach((post, index) => {
+    articlesData.forEach((post, index) => {
         const blogPost = document.createElement('article');
         blogPost.className = 'blog-post';
         
@@ -208,3 +223,40 @@ if(blogPostsContainer) {
         blogPostsContainer.appendChild(blogPost);
     });
 }
+
+// 如果侧边栏存在，动态填充最新文章和分类
+window.addEventListener('DOMContentLoaded', function() {
+    // 填充最新文章列表
+    const recentPostsList = document.querySelector('.recent-posts');
+    if(recentPostsList) {
+        // 清空现有内容
+        recentPostsList.innerHTML = '';
+        
+        // 添加最新文章
+        const recentArticles = getLatestArticles(4);
+        recentArticles.forEach(article => {
+            const listItem = document.createElement('li');
+            listItem.innerHTML = `<a href="${article.url}" class="recent-post-link">${article.title}</a>`;
+            recentPostsList.appendChild(listItem);
+        });
+    }
+    
+    // 填充分类列表
+    const categoriesList = document.querySelector('.categories');
+    if(categoriesList) {
+        // 获取所有唯一类别
+        const allCategories = [...new Set(articlesData.map(article => article.category))];
+        
+        // 清空现有内容
+        categoriesList.innerHTML = '';
+        
+        // 添加分类
+        allCategories.forEach(category => {
+            const listItem = document.createElement('li');
+            let linkUrl = './blog.html'; // 默认链接到博客首页
+            
+            listItem.innerHTML = `<a href="${linkUrl}" class="category-link">${category}</a>`;
+            categoriesList.appendChild(listItem);
+        });
+    }
+});
