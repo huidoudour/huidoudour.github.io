@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>信创样题笔记 - huidoudour 博客</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../css/blog.css">
+    <style>
+        /* 修复代码块超出容器的问题 */
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-x: auto;
+        }
+        code {
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .post-content pre code {
+            max-width: 100%;
+            display: block;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="avatar">
+                <img src="https://github.com/huidoudour.png" alt="GitHub Avatar" onerror="this.src='../../images/avatar.png'; this.onerror=null;">
+            </div>
+            <h1>huidoudour 的博客</h1>
+            <div class="nav-menu">
+                <a href="../../index.html" class="nav-item" target="_blank">
+                    <i class="fas fa-home"></i> 项目导航
+                </a>
+                <a href="../../blog.html" class="nav-item">
+                    <i class="fas fa-blog"></i> 博客首页
+                </a>
+            </div>
+        </header>
+
+        <div class="blog-layout">
+            <aside class="sidebar">
+                <div class="widget">
+                    <h3 class="widget-title">关于我</h3>
+                    <p>一名热爱技术的前端开发者，专注于Web技术的研究与实践，喜欢分享开发经验和心得。</p>
+                </div>
+
+                <div class="widget">
+                    <h3 class="widget-title">最新文章</h3>
+                    <ul class="recent-posts">
+                        <li><a href="../../articles/learning-new-tech.html" class="recent-post-link" target="_blank">学习新技术的心路历程</a></li>
+                        <li><a href="../../articles/frontend-best-practices.html" class="recent-post-link" target="_blank">前端开发中的最佳实践</a></li>
+                        <li><a href="../../articles/tech-docs/network-system-management-initialization.html" class="recent-post-link" target="_blank">网络系统管理 - 初始化配置</a></li>
+                        <li><a href="../../articles/tech-docs/redis-setup.html" class="recent-post-link" target="_blank">在Kylin/OpenEuler上搭建Redis Cluster集群</a></li>
+                        <li><a href="../../articles/tech-docs/ukui-installation.html" class="recent-post-link" target="_blank">安装 UKUI 图形界面</a></li>
+                    </ul>
+                </div>
+
+                <div class="widget">
+                    <h3 class="widget-title">分类</h3>
+                    <ul class="categories">
+                        <li><a href="../../blog.html" class="category-link">技术分享</a></li>
+                        <li><a href="../../blog.html" class="category-link">学习笔记</a></li>
+                        <li><a href="../../blog.html" class="category-link">项目经验</a></li>
+                        <li><a href="../../blog.html" class="category-link">生活感悟</a></li>
+                    </ul>
+                </div>
+
+                <div class="widget">
+                    <h3 class="widget-title">时间问候</h3>
+                    <p id="time">您好！今天是美好的一天</p>
+                    <p id="runtime">本站已运行: 0 天 0 小时 0 分 0 秒</p>
+                </div>
+            </aside>
+
+            <main class="main-content">
+                <article class="post">
+                    <header class="post-header">
+                        <h1 class="post-title">信创样题笔记</h1>
+                        <div class="post-meta">
+                            <span><i class="far fa-calendar"></i> 2026-01-30</span>
+                            <span><i class="far fa-folder"></i> 技术文档</span>
+                            <span><i class="far fa-clock"></i> 15分钟阅读</span>
+                        </div>
+                    </header>
+                    
+                    <div class="post-content">
+                        <h1>DNS服务</h1>
+                        <h3>1、所有 ecs主机启用防火墙，防火墙区域为 public，在防火墙中放行对应服务端口。</h3>
+                        <pre><code class="language-bash">systemctl start firewalld #启动防火墙
+
+firewall-cmd --zone=public --add-port=XX/tcp --add-port=XX/udp #启用对应的端口号
+
+firewall-cmd --permanent --add-service=XX #放行对应服务
+
+systemctl restart firewalld #重启防火墙服务使配置生效
+
+firewall-cmd --list-all #查询验证配置结果</code></pre>
+                        <h3>2、 利用 bind 和 bind-utils，配置 ecs1为主dns 服务器，为所有 ecs 主机提供冗余 dns 正反向解析服务。</h3>
+                        <h5>ECS1上完成</h5>
+                        <p>放行防火墙DNS服务端口并重新加载</p>
+                        <pre><code class="language-bash">firewall-cmd --permanent --add-port=53/tcp --add-port=53/udp
+firewall-cmd --reload</code></pre>
+                        <pre><code class="language-bash">yum install -y bind-chroot #下载DNS服务
+
+systemctl start named #启动DNS服务
+
+systemctl enable named #设置开机自启动</code></pre>
+                        <pre><code class="language-bash">vim /etc/named.conf #编辑DNS端口配置文件
+
+options {
+        listen-on port 53 { any; };
+        listen-on-v6 port 53 { ::1; };
+        directory       "/var/named";
+        dump-file       "/var/named/data/cache_dump.db";
+        statistics-file "/var/named/data/named_stats.txt";
+        memstatistics-file "/var/named/data/named_mem_stats.txt";
+        secroots-file   "/var/named/data/named.secroots";
+        recursing-file  "/var/named/data/named.recursing";
+        allow-query     { any; };</code></pre>
+                        <pre><code class="language-bash">vim /etc/named.rfc1912.zones #编辑主配置文件添加以下代码
+
+zone "xckt.com" IN {
+        type master;
+        file "xckt.com.zone";
+        allow-update { none; };
+};
+
+zone "11.168.192.in-addr.arpa" IN {
+        type master;
+        file "11.168.192.zone";
+        allow-update { none; };
+};</code></pre>
+                        <pre><code class="language-bash">cd /var/named #进入解析文件目录
+
+cp -p named.localhost xckt.com.zone #复制正向解析模板
+
+cp -p named.loopback 11.168.192.zone #复制反向解析模板</code></pre>
+                        <pre><code class="language-bash">vim xckt.com.zone #编辑正向解析模板
+
+$TTL 1D
+@       IN SOA  @ rname.invalid. (
+                                        0       ; serial
+                                        1D      ; refresh
+                                        1H      ; retry
+                                        1W      ; expire
+                                        3H )    ; minimum
+        NS      @
+        A       127.0.0.1
+        AAAA    ::1
+ecs1    A       192.168.11.101
+ecs2    A       192.168.11.102
+ecs3    A       192.168.11.103</code></pre>
+                        <pre><code class="language-bash">vim 11.168.192.zone #编辑反向解析模板
+
+$TTL 1D
+@       IN SOA  @ rname.invalid. (
+                                        0       ; serial
+                                        1D      ; refresh
+                                        1H      ; retry
+                                        1W      ; expire
+                                        3H )    ; minimum
+        NS      @
+        A       127.0.0.1
+        AAAA    ::1
+        PTR     localhost.
+101     PTR     ecs1.xckt.com.
+102     PTR     ecs2.xckt.com.
+103     PTR     ecs3.xckt.com.</code></pre>
+                        <pre><code class="language-bash">systemctl restart named #重启DNS服务</code></pre>
+                        <pre><code class="language-bash">nslookup ecs*.xckt.com
+nslookup 192.168.11.10* #验证测试</code></pre>
+                        <h5>ECS2上完成</h5>
+                        <p>放行防火墙DNS服务端口并重新加载</p>
+                        <pre><code class="language-bash">firewall-cmd --permanent --add-port=53/tcp --add-port=53/udp
+firewall-cmd --reload</code></pre>
+                        <pre><code class="language-bash">yum install -y bind-chroot #下载DNS服务</code></pre>
+                        <pre><code class="language-bash">vim /etc/named.conf #编辑DNS端口文件
+
+options {
+        listen-on port 53 { any; };
+        listen-on-v6 port 53 { ::1; };
+        directory       "/var/named";
+        dump-file       "/var/named/data/cache_dump.db";
+        statistics-file "/var/named/data/named_stats.txt";
+        memstatistics-file "/var/named/data/named_mem_stats.txt";
+        secroots-file   "/var/named/data/named.secroots";
+        recursing-file  "/var/named/data/named.recursing";
+        allow-query     { 本机IP; };</code></pre>
+                        <pre><code class="language-bash">vim /etc/named.rfc1912.zone #编辑主配置文件添加以下代码
+
+zone "xckt.com" IN {
+        type slave;
+        file "xckt.com.zone";
+        masters { 主DNS服务器IP; };
+};
+
+zone "11.168.192.in-addr.arpa" IN {
+        type slave;
+        file "11.168.192.zone";
+        masters { 主DNS服务器IP; };
+};</code></pre>
+                        <pre><code class="language-bash">systemctl restart named #重启DNS服务</code></pre>
+                        <pre><code class="language-bash">ls /var/named #查看解析文件目录能看见文件更新过来即是成功
+
+11.168.192.zone  data     named.ca     named.localhost  slaves
+chroot           dynamic  named.empty  named.loopback   xckt.com.zone</code></pre>
+                        <h3>3、所有 ecs 主机 root 用户使用完全合格域名免密码 ssh 登录到其他 ecs主机。</h3>
+                        <pre><code class="language-bash">yum install -y sshpass #下载sshpass服务
+
+ssh-keygen #每台客户机生成ssh公钥
+
+#每台主机分别执行以下发放ssh公钥密码
+for i in {1..3};do sshpass -p 'Zjs0202520' ssh-copy-id -o StrictHostKeyChecking=no root@192.168.128.10$i;done
+
+sshpass -p 'Zjs0202520' ssh-copy-id -o StrictHostKeyChecking=no root@&lt;IP&gt;
+
+for i in {1..3};do sshpass -p 'Zjs0202520' ssh-copy-id -o StrictHostKeyChecking=no ecs$i.xckt.com;done
+
+sshpass -p 'Zjs0202520' ssh-copy-id -o StrictHostKeyChecking=no ecs1.xckt.com.</code></pre>
+                        <h3>4、配置 ecs3为 CA 服务器,为 ecs 主机颁发证书。证书颁发机构有效期 10 年，公用名为 ecs3.xckt.lan。申请并颁发一张供 ecs服务器使用的证书，证书信息：有效期=5 年，公用名=xckt.lan， 28 / 35 国家=CN，省=shanghai，城市=shanghai，组织=xckt，组织单位=system， 使用者可选名称=*.xckt.lan 和 xckt.lan。将证书 xckt.crt 和私钥 xkct.key 复制到需要证书的 ecs 服务器/etc/pki/tls 目 录。浏览器访问 https 网站时，不出现证书警告信息。</h3>
+                        <pre><code class="language-bash">yum install -y openssl* #下载证书服务
+
+cd /etc/pki/CA/ #切换至CA的工作目录
+
+touch index.txt
+echo 00 > serial #创建编号文件
+
+openssl genrsa -out ca.key 2048 #创建自签证书私钥</code></pre>
+                        <p>使用此私钥创建CA根证书的请求文件</p>
+                        <pre><code class="language-bash">openssl req -new -out ca.csr -key ca.key
+ 
+You are about to be asked to enter information that will be incorporated
+into your certificate request.
+What you are about to enter is what is called a Distinguished Name or a DN.
+There are quite a few fields but you can leave some blank
+For some fields there will be a default value,
+If you enter '.', the field will be left blank.
+-----
+Country Name (2 letter code) [XX]:CN                		//国家
+State or Province Name (full name) []:Shanghai       		//省
+Locality Name (eg, city) [Default City]:Shanghai     		//城市
+Organization Name (eg, company) [Default Company Ltd]:xckt  //组织
+Organizational Unit Name (eg, section) []:system    		//组织单位
+Common Name (eg, your name or your server's hostname) []:ecs3.xckt.lan    																//公用名
+Email Address []:                                    		//邮箱(回车跳过)
+Please enter the following 'extra' attributes
+to be sent with your certificate request
+A challenge password []:                            		//密码（回车跳过）
+An optional company name []:                        		//公司名(回车跳过)</code></pre>
+                        <pre><code class="language-bash">openssl x509 -req -days 3650 -in ca.csr -signeky ca.key -out ca.crt		#颁发CA根证书</code></pre>
+                        <p>编辑证书颁发规则文件</p>
+                        <pre><code class="language-bash">vim /etc/pki/tls/openssl.cnf
+
+45 dir             = /etc/pki/CA
+127 req_extensions = v3_req
+172 basicConstraints=CA:TRUE
+219 [ v3_req ]
+220 subjectAltName = @alt_names
+223 basicConstraints = CA:TRUE
+225 [alt_names]
+226 DNS.1=*.xckt.com
+227 DNS.2=xckt.com</code></pre>
+                        <p>申请服务器证书私钥</p>
+                        <pre><code class="language-bash">openssl genrsa -out xckt.key 2048</code></pre>
+                        <p>使用私钥创建服务器证书请求文件</p>
+                        <pre><code class="language-bash">openssl req -new -out xckt.csr -key xckt.key -config /etc/pki/tls/openssl.cnf -extensions v3_req
+
+You are about to be asked to enter information that will be incorporated
+into your certificate request.
+What you are about to enter is what is called a Distinguished Name or a DN.
+There are quite a few fields but you can leave some blank
+For some fields there will be a default value,
+If you enter '.', the field will be left blank.
+-----
+Country Name (2 letter code) [XX]:CN            			//国家
+State or Province Name (full name) []:Shanghai   			//省
+Locality Name (eg, city) [Default City]:Shanghai 			//城市
+Organization Name (eg, company) [Default Company Ltd]:xckt  //组织
+Organizational Unit Name (eg, section) []:system            //组织单位
+Common Name (eg, your name or your server's hostname) []:xckt.lan    																	//公用名
+Email Address []:                            				//邮箱(回车跳过)
+Please enter the following 'extra' attributes
+to be sent with your certificate request
+A challenge password []:                    				//密码(回车跳过)
+An optional company name []:                				//公司名(回车跳过)</code></pre>
+                        <p>使用请求文件颁发证书</p>
+                        <pre><code class="language-bash">openssl ca -in xckt.csr  -out xckt.crt -cert ca.crt  -keyfile ca.key -extensions v3_req -days 1825 -config /etc/pki/tls/openssl.cnf
+
+Using configuration from /etc/pki/tls/openssl.cnf
+Check that the request matches the signature
+Signature ok
+Certificate Details:
+        Serial Number: 0 (0x0)
+        Validity
+            Not Before: Feb 12 16:16:02 2023 GMT
+            Not After : Feb 11 16:16:02 2028 GMT
+        Subject:
+            countryName               = CN
+            stateOrProvinceName       = Shanghai
+            organizationName          = xckt
+            organizationalUnitName    = system
+            commonName                = xckt.lan
+        X509v3 extensions:
+            X509v3 Subject Alternative Name: 
+                DNS:*.xckt.com, DNS:xckt.com
+            X509v3 Basic Constraints: 
+                CA:TRUE
+            X509v3 Key Usage: 
+                Digital Signature, Non Repudiation, Key Encipherment
+Certificate is to be certified until Feb 11 16:16:02 2028 GMT (1825 days)
+Sign the certificate? [y/n]:y            //输入y
+ 
+ 
+1 out of 1 certificate requests certified, commit? [y/n]y        //输入y
+Write out database with 1 new entries
+Data Base Updated</code></pre>
+                        <p>将证书 xckt.crt 和私钥 xkct.key 复制到需要证书的 ecs 服务器/etc/pki/tls 目 录</p>
+                        <pre><code class="language-bash">scp /etc/pki/CA/xckt.crt root@ECS服务器IP:/etc/pki/tls/
+scp /etc/pki/CA/xckt.key root@ECS服务器IP:/etc/pki/tls/</code></pre>
+                        <p>将证书放入每台服务器的信任目录</p>
+                        <pre><code class="language-bash">scp /etc/pki/CA/xckt.crt root@ECS服务器IP:/etc/pki/ca-trust/source/anchors/
+
+update-ca-trust #跟新证书信任列表</code></pre>
+                        <h1> Apache服务</h1>
+                        <h3>1、 配置 ecs1 为 apache 服务器，使用 xckt.com 或 any.xckt.com（any 代表任意网址前缀，用 ecs1.xckt.com 和 web.xckt.com 测试）访问时，自动跳转到 www.xckt.com 。禁止使用 ip 地址访问，访问httpd服务器可以返回"hello openeuler"。</h3>
+                        <p>放行防火墙端口并重新加载</p>
+                        <pre><code class="language-bash">firewall-cmd --permanent --add-port=81/tcp --add-port=443/tcp
+firewall-cmd --reload</code></pre>
+                        <pre><code class="language-bash">yum install -y httpd #安装Apache服务
+systemctl start httpd #启动Apache服务
+systemctl enable httpd #设置开机自启动</code></pre>
+                        <pre><code class="language-bash">vim /etc/httpd/conf.d/xckt.conf #创建一个xckt网址的配置文件并添加以下代码
+
+&lt;VirtualHost *:81&gt;
+        ServerName xckt.com
+        Redirect 301 / http://www.xckt.com:81/
+&lt;/VirtualHost&gt;
+&lt;VirtualHost *:81&gt;
+        ServerName www.xckt.com
+        Redirect 301 / https://www.xckt.com
+&lt;/VirtualHost&gt;
+&lt;VirtualHost *:81&gt;
+        ServerName 192.168.128.129
+        Redirect 403 /
+&lt;/VirtualHost&gt;
+&lt;VirtualHost *:443&gt;
+        ServerName 192.168.128.129
+        Redirect 403 /
+&lt;/VirtualHost&gt;</code></pre>
+                        <p>创建返回页面</p>
+                        <pre><code class="language-bash">echo "hello openeuler" | sudo tee /var/www/html/index.html</code></pre>
+                        <pre><code class="language-bash">systemctl restart httpd #重启Apache服务</code></pre>
+                        <p>设置正向域解析文件</p>
+                        <pre><code class="language-bash">vim /var/named/xckt.com.zone
+
+ *       A       192.168.11.101 	#添加这行解析参数
+ @       A       192.168.11.101		#使用仅域名访问</code></pre>
+                        <h3>2、80端口作为黑客攻击常用的漏扫端口，为保障服务器避免攻击设置仅允许客户端通过httpd服务器IP地址的81端口访问该服务器。</h3>
+                        <p>关闭防火墙80端口并重新加载</p>
+                        <pre><code class="language-bash">firewall-cmd --permanent --remove-port=80/tcp
+firewall-cmd --reload</code></pre>
+                        <p>修改Apache配置文件</p>
+                        <pre><code class="language-bash">vim /etc/httpd/conf/httpd.conf
+
+Listen 80 修改为 Listen 81 #修改监听端口</code></pre>
+                        <p>修改xckt网址配置文件</p>
+                        <pre><code class="language-bash">vim /etc/httpd/conf.d/xckt.conf
+
+将每个&lt;VirtualHost *:80&gt;更改为&lt;VirtualHost *:81&gt;</code></pre>
+                        <p>重启Apache服务</p>
+                        <pre><code class="language-bash">systemctl restart httpd</code></pre>
+                        <h3>3.配置MPM工作模式为worker。</h3>
+                        <p>编辑mpm配置文件</p>
+                        <pre><code class="language-bash">vim /etc/httpd/conf.modules.d/00-mpm.conf
+
+#找到worker模块取消注释
+LoadModule mpm_worker_module modules/mod_mpm_worker.so
+
+其他加上注释</code></pre>
+                        <p>重启Apache服务</p>
+                        <pre><code class="language-bash">systemctl restart httpd</code></pre>
+                        <p>验证配置</p>
+                        <pre><code class="language-bash">apachectl -M | grep mpm</code></pre>
+                        <h3>4．客户端访问 apache 服务时，必需有 SSL 证书。</h3>
+                        <p>安装mod_ssl模块</p>
+                        <pre><code class="language-bash">yum install -y mod_ssl</code></pre>
+                        <p>编辑ssl配置文件修改以下配置</p>
+                        <pre><code class="language-bash">vim /etc/httpd/conf.d/ssl.conf
+
+101 SSLCertificateFile /etc/pki/tls/xckt.crt #证书
+109 SSLCertificateKeyFile /etc/pki/tls/xckt.key #密钥
+
+</code></pre>
+                        <p>验证配置</p>
+                        <pre><code class="language-bash">curl https://www.xckt.com</code></pre>
+                        <h1> Nginx服务</h1>
+                        <h3>1.配置ecs2为nginx服务器，默认文档index.html的内容为"HelloNginx"；仅允许使用域名访问，http访问自动跳转到https。</h3>
+                        <pre><code class="language-bash">yum install -y nginx #安装Nginx服务
+systemctl start nginx #启动Nginx服务
+systemctl enable nginx #设置开机自启动</code></pre>
+                        <p>放行防火墙端口并重新加载</p>
+                        <pre><code class="language-bash">firewall-cmd --permanent --add-port=80/tcp --add-port=443/tcp
+firewall-cmd --reload</code></pre>
+                        <p>创建网站页面文件内容</p>
+                        <pre><code class="language-bash">mkdir -p /usr/share/nginx/html
+echo "HelloNginx" | sudo tee /usr/share/nginx/html/index.html</code></pre>
+                        <p>创建编辑Nginx网站文件</p>
+                        <pre><code class="language-bash">vim /etc/nginx/conf.d/test.conf
+
+server {
+        listen 80;
+        server_name test.com;
+        root /usr/share/nginx/html;
+        return 301 https://$host$request_uri;
+}
+server {
+        listen 443 ssl http2;
+        server_name www.test.com;
+        root /usr/share/nginx/html;
+
+        ssl_certificate "/etc/pki/tls/test.crt";
+        ssl_certificate_key "/etc/pki/tls/test.key";
+}
+server {
+        listen 80;
+        listen 443 ssl;
+        return 403;
+}</code></pre>
+                        <h3>2.通过域名[www.test.com](http://www.test.com)，可以访问到Nginx服务中指定的主页页面，同时可访问到指定的图片文件及TXT文档(创建一个/1.png、/1.txt)</h3>
+                        <p>创建1.png和1.txt文件</p>
+                        <pre><code class="language-bash">touch /usr/share/nginx/html/1.png
+touch /usr/share/nginx/html/1.txt
+echo "This is test file" > /usr/share/nginx/html/1.txt #给1.txt写入内容</code></pre>
+                        <p>重启Nginx服务并设置开机自启动</p>
+                        <pre><code class="language-bash">systemctl restart nginx</code></pre>
+                        <p>测试配置</p>
+                        <pre><code class="language-bash">curl http://www.test.com</code></pre>
+                        <h1> MySQL服务</h1>
+                        <h3>1.在ecs1上安装MYSQL数据库，安装完成初始化数据库并设置root密码为："Admin@123"。</h3>
+                        <p>安装MySQL服务并且设置开机自启动</p>
+                        <pre><code class="language-bash">yum install -y mysql-server
+systemctl start mysqld
+systemctl enable mysqld</code></pre>
+                        <p>设置root密码</p>
+                        <pre><code class="language-bash">mysql_secure_installation
+
+#在要求输入当前密码时使用刚才查找到的临时密码。当被问及是否要更改root密码时选择"Y"，然后输入新的密码Admin@123（两次确认）。</code></pre>
+                        <h3>2.配置Mysql数据库，按照下表创建数据库Vegetables，供后续应用调用。创建一个用户:vegetables_usser(密码；Admin@123)，允许其对该数据库进行SELECT查询，同时创建用户vegetables_admin（密码；Admin@123），赋予其对该数据的全部权限。</h3>
+                        <table>
+                        <thead>
+                        <tr>
+                        <th>ID</th>
+                        <th>NAME</th>
+                        <th>Price</th>
+                        <th>Qty</th>
+                        <th>PIC</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                        <td>1</td>
+                        <td>白菜</td>
+                        <td>1.30</td>
+                        <td>200</td>
+                        <td>张三</td>
+                        </tr>
+                        <tr>
+                        <td>2</td>
+                        <td>土豆</td>
+                        <td>2.60</td>
+                        <td>300</td>
+                        <td>李四</td>
+                        </tr>
+                        <tr>
+                        <td>3</td>
+                        <td>青菜</td>
+                        <td>6.00</td>
+                        <td>150</td>
+                        <td>王五</td>
+                        </tr>
+                        <tr>
+                        <td>4</td>
+                        <td>西红柿</td>
+                        <td>5.20</td>
+                        <td>230</td>
+                        <td>赵六</td>
+                        </tr>
+                        <tr>
+                        <td>5</td>
+                        <td>黄瓜</td>
+                        <td>8.00</td>
+                        <td>330</td>
+                        <td>王五</td>
+                        </tr>
+                        </tbody>
+                        </table>
+                        <p>登录MySQL</p>
+                        <pre><code class="language-bash">mysql -u root -p
+输入密码Admin@123进入</code></pre>
+                        <p>创建数据库Vegetables</p>
+                        <pre><code class="language-mysql">CREATE DATABASE Vegetables; #创建数据库
+USE Vegetables; #调用数据库</code></pre>
+                        <p>创建表</p>
+                        <pre><code class="language-mysql">CREATE TABLE VegetableInfo (
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    NAME VARCHAR(50) NOT NULL,
+    Price DECIMAL(5,2) NOT NULL,
+    Qty INT NOT NULL,
+    PIC VARCHAR(50)
+);</code></pre>
+                        <p>插入数据</p>
+                        <pre><code class="language-mysql">INSERT INTO VegetableInfo (NAME, Price, Qty, PIC) VALUES
+('白菜', 1.30, 200, '张三'),
+('土豆', 2.60, 300, '李四'),
+('青菜', 6.00, 150, '王五'),
+('西红柿', 5.20, 230, '赵六'),
+('黄瓜', 8.00, 330, '王五');</code></pre>
+                        <p>创建用户并授权</p>
+                        <pre><code class="language-mysql">#为vegetables_user创建账户并仅授予SELECT权限：
+
+CREATE USER 'vegetables_user'@'localhost' IDENTIFIED BY 'Admin@123';
+GRANT SELECT ON Vegetables.* TO 'vegetables_user'@'localhost';</code></pre>
+                        <pre><code class="language-mysql">#为vegetables_admin创建账户并授予所有权限：
+
+CREATE USER 'vegetables_admin'@'localhost' IDENTIFIED BY 'Admin@123';
+GRANT ALL PRIVILEGES ON Vegetables.* TO 'vegetables_admin'@'localhost';</code></pre>
+                        <p>刷新权限</p>
+                        <pre><code class="language-mysql">FLUSH PRIVILEGES;</code></pre>
+                        <p>退出MySQL</p>
+                        <pre><code class="language-mysql">EXIT;</code></pre>
+                        <h3>3.创建数据库userdb；在数据库中创建数据表userinfo，在表中插入2条记录，分别为(1,user1，2005-8-1，男)，(2,user2，2005-8-2，女)，口令与用户名相同，password字段用password函数加密，表结构如下：</h3>
+                        <table>
+                        <thead>
+                        <tr>
+                        <th><strong>字段名</strong></th>
+                        <th><strong>数据类型</strong></th>
+                        <th><strong>主键</strong></th>
+                        <th><strong>自增</strong></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                        <td><strong>id</strong></td>
+                        <td>int</td>
+                        <td>是</td>
+                        <td>是</td>
+                        </tr>
+                        <tr>
+                        <td><strong>name</strong></td>
+                        <td>varchar(10)</td>
+                        <td>否</td>
+                        <td>否</td>
+                        </tr>
+                        <tr>
+                        <td><strong>birthday</strong></td>
+                        <td>datetime</td>
+                        <td>否</td>
+                        <td>否</td>
+                        </tr>
+                        <tr>
+                        <td><strong>sex</strong></td>
+                        <td>char(8)</td>
+                        <td>否</td>
+                        <td>否</td>
+                        </tr>
+                        <tr>
+                        <td><strong>password</strong></td>
+                        <td>char(200)</td>
+                        <td>否</td>
+                        <td>否</td>
+                        </tr>
+                        </tbody>
+                        </table>
+                        <p>登录MySQL</p>
+                        <pre><code class="language-bash">mysql -u root -p
+输入密码Admin@123</code></pre>
+                        <p>创建数据库</p>
+                        <pre><code class="language-mysql">CREATE DATABASE userdb; #创建数据库userdb
+USE userdb; #调用数据库</code></pre>
+                        <p>创建数据表</p>
+                        <pre><code class="language-mysql">CREATE TABLE userinfo (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(10) NOT NULL,
+    birthday DATETIME NOT NULL,
+    sex CHAR(8) NOT NULL,
+    password CHAR(200) NOT NULL
+);</code></pre>
+                        <p>插入数据</p>
+                        <pre><code class="language-mysql">INSERT INTO userinfo (name, birthday, sex, password)
+VALUES
+('user1', '2005-08-01', '男', SHA2('user1', 256)),
+('user2', '2005-08-02', '女', SHA2('user2', 256));
+#这里的256表示SHA-256算法，也可以选择512来使用SHA-512算法。</code></pre>
+                        <p>验证数据</p>
+                        <pre><code class="language-mysql">SELECT * FROM userinfo;</code></pre>
+                        <h3>4.备份数据库userdb到/var/mariadbbak/userdb.sql（含创建数据库命令）；将表userinfo中的记录导出，并存放到/var/mariadbbak/userinfo.sql文件中。</h3>
+                        <p>备份整个数据库userdb</p>
+                        <pre><code class="language-bash">mkdir -p /var/mariadbbak #创建目录 
+mysqldump -u root -p --databases userdb --add-drop-database --add-drop-table > /var/mariadbbak/userdb.sql 
+#使用mysqldump命令来备份整个userdb数据库
+#-u root 指定使用root用户。
+#-p 提示输入密码。
+#--databases userdb 指定要备份的数据库。
+#--add-drop-database 在输出文件中添加DROP DATABASE IF EXISTS语句。
+#--add-drop-table 在每个表之前添加DROP TABLE IF EXISTS语句。
+# &gt; 将输出重定向到指定的文件/var/mariadbbak/userdb.sql。</code></pre>
+                        <p>导出表userinfo中的记录</p>
+                        <pre><code class="language-bash">mysqldump -u root -p userdb userinfo --no-create-db --no-create-info --skip-triggers > /var/mariadbbak/userinfo.sql
+# userdb 是数据库名。
+# userinfo 是要导出数据的表名。
+# --no-create-db 不在输出文件中添加创建数据库的语句。
+# --no-create-info 不在输出文件中添加创建表的语句。
+# --skip-triggers 不导出触发器。
+# &gt; 将输出重定向到指定的文件/var/mariadbbak/userinfo.sql。</code></pre>
+                        <p>验证备份文件</p>
+                        <pre><code class="language-bash">cat /var/mariadbbak/userdb.sql
+cat /var/mariadbbak/userinfo.sql</code></pre>
+                        <h1> Wordpress服务</h1>
+                        <h1> Redis服务</h1>
+                        <h3>1.利用ecs1搭建rediscluster集群，使用端口8001-8003模拟主节点，8004-8006模拟从节点，让其他主机可以访问redis集群。</h3>
+                        <p>安装Redis服务</p>
+                        <pre><code class="language-bash">yum install -y redis5 #这里安装的是5版本</code></pre>
+                        <p>创建配置文件目录</p>
+                        <pre><code class="language-bash">mkdir -p /etc/redis</code></pre>
+                        <p>用循环为每个节点创建配置文件</p>
+                        <pre><code class="language-bash">for i in {1..6};do cat > /etc/redis/800$i.conf &lt;&lt;EOF
+port 800$i
+cluster-enabled yes
+cluster-config-file nodes-800$i.conf
+cluster-node-timeout 5000
+daemonize yes
+pidfile /var/run/redis-800$i.pid
+logfile /var/log/redis-800$i.log
+dir /var/lib/redis-800$i
+bind 0.0.0.0  # 允许所有 IP 地址访问
+EOF
+done</code></pre>
+                        <p>用循环启动所有Redis实例</p>
+                        <pre><code class="language-bash">for i in {1..6};do mkdir -p /var/lib/redis-800$i;done #创建dir文件目录
+for i in {1..6};do redis-server /etc/redis/redis-800$i.conf;done #启动所有实例</code></pre>
+                        <p>创建Redis集群</p>
+                        <pre><code class="language-bash">redis-cli --cluster create 127.0.0.1:8001 127.0.0.1:8002 127.0.0.1:8003 127.0.0.1:8004 127.0.0.1:8005 127.0.0.1:8006 --cluster-replicas 1
+#这个命令会创建一个包含 3 个主节点和 3 个从节点的 Redis Cluster。`--cluster-replicas 1` 表示每个主节点有一个从节点。</code></pre>
+                        <p>配置防火墙</p>
+                        <pre><code class="language-bash">firewall-cmd --zone=public --add-port=8001-8006/tcp --permanent
+firewall-cmd --reload</code></pre>
+                        <p>测试Redis集群</p>
+                        <pre><code class="language-bash">redis-cli -c -h &lt;IP&gt; -p 8001 ping
+#Return "PONG"</code></pre>
+                        <h1> NFS服务</h1>
+                        <h3>1．在ecs3安装NFS服务，并创建共享目录/data，设置仅ecs1有访问读写权限。</h3>
+                        <h5>ECS3上操作</h5>
+                        <p>安装NFS服务</p>
+                        <pre><code class="language-bash">yum install nfs-utils -y</code></pre>
+                        <p>防火墙放行NFS服务</p>
+                        <pre><code class="language-bash">firewall-cmd --permanent --add-service=nfs
+firewall-cmd --reload</code></pre>
+                        <p>创建共享目录</p>
+                        <pre><code class="language-bash">mkdir -p /data</code></pre>
+                        <p>设置目录权限</p>
+                        <pre><code class="language-bash">chown nobody:nobody /data
+chmod 777 /data</code></pre>
+                        <p>编辑NFS配置文件</p>
+                        <pre><code class="language-bash">vim /etc/exports
+
+/data &lt;ECS1_IP&gt;(rw,sync,no_subtree_check)</code></pre>
+                        <p>应用配置更改并启动NFS服务</p>
+                        <pre><code class="language-bash">exportfs -a
+systemctl start nfs-server
+systemctl enable nfs-server</code></pre>
+                        <h3>2、在ecs1上添加共享目录，设置开机自动挂载。在该共享目录下创建文件名为：file01。在文件内添加内容：openeuler01。</h3>
+                        <h5>ECS1上操作</h5>
+                        <p>安装NFS服务</p>
+                        <pre><code class="language-bash">yum install nfs-utils -y</code></pre>
+                        <p>防火墙放行NFS服务</p>
+                        <pre><code class="language-bash">firewall-cmd --permanent --add-service=nfs
+firewall-cmd --reload</code></pre>
+                        <p>创建本地挂载点</p>
+                        <pre><code class="language-bash">mkdir -p /mnt/data</code></pre>
+                        <p>手动挂载NFS共享目录</p>
+                        <pre><code class="language-bash">mount -t nfs &lt;ECS3_IP&gt;:/data /mnt/data</code></pre>
+                        <p>设置开机自动挂载</p>
+                        <pre><code class="language-bash">vim /etc/fstab #添加以下配置
+
+&lt;ECS3_IP&gt;:/data  /mnt/data  nfs  defaults  0  0</code></pre>
+                        <p>检查挂载</p>
+                        <pre><code class="language-bash">df -h</code></pre>
+                        <p>创建文件并写入内容</p>
+                        <pre><code class="language-bash">touch /mnt/data/file01
+echo "openeuler01" | sudo tee /mnt/data/file01</code></pre>
+                        <h1> Ansible服务</h1>
+                        <h3>1. 在ecs3安装Ansible服务，添加ecs1/ecs2为受控节点。</h3>
+                        <p>在ECS3安装Ansible服务</p>
+                        <pre><code class="language-bash">yum install -y ansible</code></pre>
+                        <p>添加ECS1和ECS2为受控节点</p>
+                        <pre><code class="language-bash">vim /etc/ansible/hosts #编辑主机清单配置文件添加以下代码
+
+[dev]
+192.168.128.129
+192.168.128.130
+[test]
+192.168.128.129
+192.168.128.130
+[prod]
+192.168.128.129
+192.168.128.130</code></pre>
+                        <h3>2、使用用户列表user.list.yml，并将它保存到/home/student/ansible，用户密码来自于/home/student/ansible/locker.yml文件。</h3>
+                        <p>创建用户列表和密码文件目录</p>
+                        <pre><code class="language-bash">mkdir -p /home/student/ansible</code></pre>
+                        <p>创建用户列表文件并写入内容</p>
+                        <pre><code class="language-bash">vim /home/student/ansible/user.list.yml #用户列表文件写入以下代码
+
+users:
+  - name: alice
+    role: developer
+  - name: bob
+    role: developer
+  - name: charlie
+    role: manager</code></pre>
+                        <p>创建密码文件并写入内容</p>
+                        <pre><code class="language-bash">vim /home/student/ansible/locker.yml #密码文件写入以下代码
+
+pw_developer: "developer_password"
+pw_manager: "manager_password"</code></pre>
+                        <h3>3. 创建名为/opt/users.yml 的playbook，从而按以下所述创建用户帐户：职位描述为 developer 的用户应当：在 dev 和 test 主机组中的受管节点上创建 从 pw_developer 变量分配密码 是附加组 student 的成员 职位描述为 manager 的用户应当： 在 prod 主机组中的受管节点上创建 从 pw_manager 变量分配密码 是附加组 opsmgr 的成员 。</h3>
+                        <h3>4、密码应采用 SHA512 哈希格式。</h3>
+                        <p>创建playbook进行配置并配置密码采用SHA512哈希格式</p>
+                        <pre><code class="language-bash">vim /opt/users.yml
+
+---
+- name: Create users based on their roles
+  hosts: all
+  become: yes
+  vars:
+    pw_developer: "{{ lookup('file', '/opt/secret.txt').split('\n')[0] }}"
+    pw_manager: "{{ lookup('file', '/opt/secret.txt').split('\n')[1] }}"
+  tasks:
+    - name: Include user list
+      include_vars:
+        file: /home/student/ansible/user.list.yml
+        name: user_list
+    - name: Ensure required groups exist
+      group:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - student
+        - opsmgr
+    - name: Debug user list
+      debug:
+        var: user_list
+    - name: Create developer users
+      user:
+        name: "{{ item.name }}"
+        password: "{{ pw_developer | password_hash('sha512') }}"
+        groups: student
+        state: present
+      loop: "{{ user_list.users }}"
+      when: item.role == 'developer' and (inventory_hostname in groups['dev'] or inventory_hostname in groups['test'])
+    - name: Create manager users
+      user:
+        name: "{{ item.name }}"
+        password: "{{ pw_manager | password_hash('sha512') }}"
+        groups: opsmgr
+        state: present
+      loop: "{{ user_list.users }}"
+      when: item.role == 'manager' and inventory_hostname in groups['prod']</code></pre>
+                        <h3>5、 playbook 使用在其他位置创建的库密码文件 /opt/secret.txt 正常运行。</h3>
+                        <p>创建密码库文件</p>
+                        <pre><code class="language-bash">echo "developer_password" > /opt/secret.txt
+echo "manager_password" >> /opt/secret.txt</code></pre>
+                        <p>运行playbook创建用户账户</p>
+                        <pre><code class="language-bash">ansible-playbook /opt/users.yml</code></pre>
+                        <h1> Opengauss服务</h1>
+                        <h3>1、在ecs2安装open gauss数据库及配套工具，初始化数据库并设置ROOT密码为:Admin@123。</h3>
+                        <p>安装opengauss服务</p>
+                        <pre><code class="language-bash">yum install -y opengauss</code></pre>
+                        <p>切换到opengauss用户下进行操作</p>
+                        <pre><code class="language-bash">su - opengauss</code></pre>
+                        <p>初始化数据库并配置root密码</p>
+                        <pre><code class="language-bash">rm -rf /var/lib/opengauss/data/* #删除源数据库文件
+gs_initdb -D /var/lib/opengauss/data/ --username=root --pwpasswd=Admin@123 --nodename=sing_node;
+#初始化数据库并创建root用户</code></pre>
+                        <p>启动数据库</p>
+                        <pre><code class="language-bash">gs_ctl start -D /var/lib/opengauss/data/ -Z single_node</code></pre>
+                        <p>配置密码规则</p>
+                        <pre><code class="language-bash">vim /var/lib/opengauss/data/postgresql.conf #编辑配置文件更改以下代码
+
+110 password_encryption_type = 0
+#或者
+
+echo "password_encryption_type = 0" >> /var/lib/opengauss/data/postgresql.conf
+
+#"&gt;&gt;" 表示追加</code></pre>
+                        <p>以超级管理员登录Opengauss数据库</p>
+                        <pre><code class="language-bash">gsql -d postgres -p 7654 -U root -r</code></pre>
+                        <h3>2、 登录postgres数据库，创建一个用户密码为：user_test/Admin@123，同时创建数据库实例名为：db_test，创建模式为sche_test，完成后创建下表，表名为：tb_test.。</h3>
+                        <table>
+                        <thead>
+                        <tr>
+                        <th>c_customer_sk</th>
+                        <th>integer</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                        <td>c_customer_id</td>
+                        <td>char(5)</td>
+                        </tr>
+                        <tr>
+                        <td>c_first_name</td>
+                        <td>char(6)</td>
+                        </tr>
+                        <tr>
+                        <td>c_last_name</td>
+                        <td>char(8)</td>
+                        </tr>
+                        <tr>
+                        <td>Amount</td>
+                        <td>intger</td>
+                        </tr>
+                        </tbody>
+                        </table>
+                        <p>创建用户user_test并设置密码</p>
+                        <pre><code class="language-mysql">CREATE USER user_test WITH PASSWORD 'Admin@123';</code></pre>
+                        <p>创建数据库实例db_test</p>
+                        <pre><code class="language-mysql">CREATE DATABASE db_test;</code></pre>
+                        <p>连接到数据库db_test中并设置模式为sche_test</p>
+                        <pre><code class="language-mysql">\c db_test;
+
+CREATE SCHEMA sche_test;</code></pre>
+                        <p>在db_test数据库中创建表tb_test</p>
+                        <pre><code class="language-mysql">CREATE TABLE sche_test.tb_test (
+c_customer_sk integer,
+c_customer_id char(5),
+c_first_name char(6),
+c_last_name char(8),
+Amount integer
+);</code></pre>
+                        <h3>3、撤销user_test用户的sysadmin权限和LOGIN权限，将sche_test的使用权限和表tb_test的所有权限授权给用户user_test。</h3>
+                        <p>登录Opengauss进入数据库db_test</p>
+                        <pre><code class="language-bash">gsql -d postgres -p 7654 -r
+\c db_test;</code></pre>
+                        <p>撤销user_test用户的sysadmin权限</p>
+                        <pre><code class="language-mysql">ALTER USER user_test NOSYSADMIN;</code></pre>
+                        <p>撤销user_test用户的LOGIN权限</p>
+                        <pre><code class="language-mysql">ALTER USER user_test NOLOGIN;</code></pre>
+                        <p>将sche_test的使用权限授权给用户user_test</p>
+                        <pre><code class="language-mysql">GRANT USAGE ON SCHEMA sche_test TO user_test;</code></pre>
+                        <p>将表tb_test 的所有权限授权给用户user_test</p>
+                        <pre><code class="language-mysql">GRANT ALL PRIVILEGES ON TABLE sche_test.tb_test TO user_test;</code></pre>
+                        <h1> 数据库迁移管理</h1>
+                        <h1> 数据库安全管理</h1>
+                        <h3>2、创建joe用户，并将sysadmin权限授予joe用户。并将tb_test表格的所有权限授权给用户joe。</h3>
+                        <p>进入ECS2切换至opengauss用户</p>
+                        <pre><code class="language-bash">su - opengauss #带环境切换</code></pre>
+                        <p>启动数据库</p>
+                        <pre><code class="language-bash">gs_ctl start -D /var/lib/opengauss/data/ -Z single_node</code></pre>
+                        <p>登录数据库</p>
+                        <pre><code class="language-bash">gsql -d postgres -p 7654 -r</code></pre>
+                        <p>创建joe用户并设置密码为Admin@123</p>
+                        <pre><code class="language-mysql">CREATE USER joe WITH PASSWORD 'Admin@123';</code></pre>
+                        <p>授予joe用户sysadmin权限</p>
+                        <pre><code class="language-mysql">ALTER ROLE joe WITH SYSADMIN;</code></pre>
+                        <p>进入db_test数据库实例</p>
+                        <pre><code class="language-mysql">\c db_test</code></pre>
+                        <p>将tb_test表的所有权限授权给joe</p>
+                        <pre><code class="language-mysql">GRANT ALL PRIVILEGES ON TABLE sche_test.tb_test TO joe;</code></pre>
+                        <h3>3、创建manager用户，将joe的权限授权给manager，并允许该角色权限授权给其他用户。</h3>
+                        <p>登录数据库</p>
+                        <pre><code class="language-bash">gsql -d postgres -p 7654 -r</code></pre>
+                        <p>创建用户 manager并设置密码为Admin@123</p>
+                        <pre><code class="language-mysql">CREATE USER manager WITH PASSWORD 'Admin@123';</code></pre>
+                        <p>给 manager 授予 joe 相同的权限并允许manager将这些权限再授予其他用户</p>
+                        <pre><code class="language-mysql">GRANT joe TO manager; #manager 授予 joe 相同的权限
+GRANT joe TO manager WITH ADMIN OPTION; #允许manager将这些权限再授予其他用户</code></pre>
+                        <h1> 信创系统加固</h1>
+                        <h3>1、 ecs1、ecs2、ecs3为了防止dos攻击，打开系统的SYN泛滥保护，禁止对ping的广播响应，禁止对ICMP报文进行接受重定向也不允许所有端口发送IPV4重定向报文，启用日志记录异常的IP地址报文。</h3>
+                        <p>编辑/etc/sysctl.conf文件并添加或修改参数</p>
+                        <pre><code class="language-bash">vim /etc/sysctl.conf
+
+net.ipv4.tcp_syncookies = 1  #打开SYN泛滥保护
+net.ipv4.icmp_echo_ignore_broadcasts = 1  #禁止对ping的广播响应
+net.ipv4.conf.all.accept_redirects = 0  
+net.ipv4.conf.default.accept_redirects = 0 #禁止对ICMP报文进行接受重定向
+net.ipv4.conf.all.send_redirects = 0  
+net.ipv4.conf.default.send_redirects = 0 #禁止所有端口发送IPV4重定向报文
+net.ipv4.conf.all.log_martians=1 #启用日志记录异常的IP地址报文
+net.ipv4.conf.default.log_martians = 1</code></pre>
+                        <p>重新加载配置</p>
+                        <pre><code class="language-bash">sysctl -p </code></pre>
+                        <h3>2、ecs1、ecs2、ecs3设置禁止通过ctrl+alt+del进行重启，设置所有用户默认的umask值为0077。设置安全单用户模式。</h3>
+                        <p>禁止通过ctrl+alt+del进行重启</p>
+                        <pre><code class="language-bash">rm -f /etc/systemd/system/ctrl-alt-del.target
+rm -f /usr/lib/systemd/system/ctrl-alt-del.target #删除两个ctrl-alt-del.target文件</code></pre>
+                        <pre><code class="language-bash">vim /etc/systemd/system.conf #将#CtrlAltDelBurstAction=reboot-force修改为CtrlAltDelBurstAction=none
+
+29 CtrlAltDelBurstAction=none
+
+#或者
+echo "CtrlAltDelBurstAction=none" >> /etc/systemd/system.conf</code></pre>
+                        <pre><code class="language-bash">systemctl daemon-reexec #重启systemd</code></pre>
+                        <p>设置所有用户默认的umask值为0077</p>
+                        <pre><code class="language-bash">echo "umask 0077" >> /etc/bashrc
+echo "umask 0077" >> /etc/profile #分别在/etc/bashrc文件和/etc/profile目录下的所有文件中加入"umask 0077"</code></pre>
+                        <pre><code class="language-bash">#跳过本来就是root所有
+chown root.root /etc/bashrc
+chown root.root /etc/profile #设置/etc/bashrc文件和/etc/profile目录下所有文件的属主为root，群组为root</code></pre>
+                        <p>设置安全单用户模式</p>
+                        <pre><code class="language-bash">vim /etc/sysconfig/init #将SINGLE选项配置为SINGLE=/sbin/sulogin
+
+SINGLE=/sbin/sulogin</code></pre>
+                        <pre><code class="language-bash">#或者
+echo "SINGLE=/sbin/sulogin" >> /etc/sysconfig/init</code></pre>
+                        <h3>3、 出于系统账号密码安全性考虑，ecs1、ecs2、ecs3设置所有用户口令最大有效期90天，随时可以修改账号密码，最小长度8位，密码到期前7天开始提示。为了防止暴力破解设置系统登录失败超过三次后锁定系统，自动解锁时间为300秒。</h3>
+                        <p>编辑/etc/login.defs密码策略文件更改以下参数</p>
+                        <pre><code class="language-bash">vim /etc/login.defs
+
+131 PASS_MAX_DAYS   90
+133 PASS_MIN_LEN    8
+134 PASS_WARN_AGE   7</code></pre>
+                        <p>修改/etc/pam.d/password-auth和/etc/pam.d/system-auth文件设置登录锁定</p>
+                        <pre><code class="language-bash">vim /etc/pam.d/password-auth
+
+4 auth        required      pam_faillock.so preauth audit deny=3 even_deny_root unlock_time=300
+8 auth        [default=die] pam_faillock.so authfail audit deny=3 even_deny_root unlock_time=300
+9 auth        sufficient    pam_faillock.so authsucc audit deny=3 even_deny_root unlock_time=300</code></pre>
+                        <pre><code class="language-bash">vim /etc/pam.d/system-auth
+
+4 auth        required      pam_faillock.so preauth audit deny=3 even_deny_root unlock_time=300
+8 auth        [default=die] pam_faillock.so authfail audit deny=3 even_deny_root unlock_time=300
+9 auth        sufficient    pam_faillock.so authsucc audit deny=3 even_deny_root unlock_time=300</code></pre>
+                        <h3>4、设置ecs1/ecs2/ecs3的SSH登录最大失败次数为3，禁止空口令账户登录，设置15min后结束空闲SSH会话。</h3>
+                        <p>修改SSH的配置文件/etc/ssh/sshd_config</p>
+                        <pre><code class="language-bash">vim /etc/ssh/sshd_config
+
+43 MaxAuthTries 3
+111 ClientAliveInterval 900
+112 ClientAliveCountMax 3</code></pre>
+                    </div>
+                </article>
+
+                <div class="comments-section">
+                    <h3>评论</h3>
+                    <div class="comment-form">
+                        <form id="commentForm">
+                            <div class="form-group">
+                                <label for="name">姓名</label>
+                                <input type="text" id="name" name="name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">邮箱</label>
+                                <input type="email" id="email" name="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="comment">评论</label>
+                                <textarea id="comment" name="comment" required></textarea>
+                            </div>
+                            <button type="submit" class="btn">发表评论</button>
+                        </form>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <footer>
+            <p>© 2025 huidoudour 的博客 | 专注于技术分享与学习心得</p>
+            <p>最后更新: 2026-01-30</p>
+        </footer>
+    </div>
+
+    <script src="../../js/blog.js"></script>
+</body>
+</html>

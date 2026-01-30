@@ -3,22 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>博客文章模板 - huidoudour 博客</title>
+    <title>前端开发中的最佳实践 - huidoudour 博客</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="./css/blog.css">
+    <link rel="stylesheet" href="../css/blog.css">
 </head>
 <body>
     <div class="container">
         <header>
             <div class="avatar">
-                <img src="https://github.com/huidoudour.png" alt="GitHub Avatar" onerror="this.src='./images/avatar.png'; this.onerror=null;">
+                <img src="https://github.com/huidoudour.png" alt="GitHub Avatar" onerror="this.src='../images/avatar.png'; this.onerror=null;">
             </div>
             <h1>huidoudour 的博客</h1>
             <div class="nav-menu">
-                <a href="./index.html" class="nav-item">
+                <a href="../index.html" class="nav-item">
                     <i class="fas fa-home"></i> 项目导航
                 </a>
-                <a href="./blog.html" class="nav-item">
+                <a href="../blog.html" class="nav-item">
                     <i class="fas fa-blog"></i> 博客首页
                 </a>
             </div>
@@ -34,20 +34,20 @@
                 <div class="widget">
                     <h3 class="widget-title">最新文章</h3>
                     <ul class="recent-posts">
-                        <li><a href="./articles/frontend-best-practices.html" class="recent-post-link">前端开发中的最佳实践</a></li>
-                        <li><a href="./articles/learning-new-tech.html" class="recent-post-link">学习新技术的心路历程</a></li>
+                        <li><a href="./learning-new-tech.html" class="recent-post-link">学习新技术的心路历程</a></li>
                         <li><a href="#" class="recent-post-link">项目开发中的架构设计</a></li>
                         <li><a href="#" class="recent-post-link">Git 使用技巧与工作流</a></li>
+                        <li><a href="#" class="recent-post-link">性能优化实战案例</a></li>
                     </ul>
                 </div>
 
                 <div class="widget">
                     <h3 class="widget-title">分类</h3>
                     <ul class="categories">
-                        <li><a href="./blog.html" class="category-link">技术分享</a></li>
-                        <li><a href="./blog.html" class="category-link">学习笔记</a></li>
-                        <li><a href="./blog.html" class="category-link">项目经验</a></li>
-                        <li><a href="./blog.html" class="category-link">生活感悟</a></li>
+                        <li><a href="../blog.html" class="category-link">技术分享</a></li>
+                        <li><a href="../blog.html" class="category-link">学习笔记</a></li>
+                        <li><a href="../blog.html" class="category-link">项目经验</a></li>
+                        <li><a href="../blog.html" class="category-link">生活感悟</a></li>
                     </ul>
                 </div>
 
@@ -61,33 +61,44 @@
             <main class="main-content">
                 <article class="post">
                     <header class="post-header">
-                        <h1 class="post-title">博客文章模板</h1>
+                        <h1 class="post-title">前端开发中的最佳实践</h1>
                         <div class="post-meta">
-                            <span><i class="far fa-calendar"></i> 2026-01-22</span>
-                            <span><i class="far fa-folder"></i> 模板</span>
-                            <span><i class="far fa-clock"></i> 1分钟阅读</span>
+                            <span><i class="far fa-calendar"></i> 2026-01-15</span>
+                            <span><i class="far fa-folder"></i> 技术分享</span>
+                            <span><i class="far fa-clock"></i> 5分钟阅读</span>
                         </div>
                     </header>
                     
                     <div class="post-content">
-                        <p>这是一个博客文章模板页面。每篇博客文章都应该有自己的独立页面，位于 <code>/articles/</code> 目录下。</p>
+                        <p>在现代前端开发中，遵循最佳实践对于构建高质量、可维护的应用程序至关重要。本文将分享我在前端开发过程中积累的一些经验和实践。</p>
                         
-                        <h2>独立文章页面的优势</h2>
-                        <p>为每篇文章创建独立页面的好处：</p>
+                        <h2>代码组织与结构</h2>
+                        <p>良好的代码组织是项目成功的关键。我通常会按照功能模块来组织代码，例如：</p>
                         <ul>
-                            <li>更好的SEO效果</li>
-                            <li>便于分享和链接</li>
-                            <li>更清晰的URL结构</li>
-                            <li>独立的元数据设置</li>
+                            <li>components - 可复用的UI组件</li>
+                            <li>utils - 工具函数</li>
+                            <li>services - API服务层</li>
+                            <li>styles - 样式文件</li>
+                            <li>assets - 静态资源</li>
                         </ul>
                         
-                        <h2>如何创建新文章</h2>
-                        <p>要创建新文章，请参考现有文章模板，在 <code>/articles/</code> 目录下创建新文件。</p>
+                        <h2>性能优化策略</h2>
+                        <p>性能优化是前端开发中不可忽视的一环。以下是一些常见的优化策略：</p>
+                        <ol>
+                            <li>图片懒加载和压缩</li>
+                            <li>代码分割和按需加载</li>
+                            <li>缓存策略的合理运用</li>
+                            <li>减少重绘和回流</li>
+                        </ol>
+                        
+                        <h2>用户体验设计</h2>
+                        <p>优秀的用户体验能让产品脱颖而出。关注细节，如加载状态、错误处理、无障碍访问等，都是提升用户体验的重要因素。</p>
                         
                         <div class="tags">
-                            <span class="tag">博客</span>
-                            <span class="tag">模板</span>
-                            <span class="tag">说明</span>
+                            <span class="tag">前端开发</span>
+                            <span class="tag">最佳实践</span>
+                            <span class="tag">性能优化</span>
+                            <span class="tag">用户体验</span>
                         </div>
                     </div>
                 </article>
@@ -121,6 +132,6 @@
         </footer>
     </div>
 
-    <script src="./js/blog.js"></script>
+    <script src="../js/blog.js"></script>
 </body>
 </html>

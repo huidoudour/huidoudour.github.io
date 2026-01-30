@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>安装 UKUI 图形界面 - huidoudour 博客</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../css/blog.css">
+    <style>
+        /* 修复代码块超出容器的问题 */
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-x: auto;
+        }
+        code {
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .post-content pre code {
+            max-width: 100%;
+            display: block;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="avatar">
+                <img src="https://github.com/huidoudour.png" alt="GitHub Avatar" onerror="this.src='../../images/avatar.png'; this.onerror=null;">
+            </div>
+            <h1>huidoudour 的博客</h1>
+            <div class="nav-menu">
+                <a href="../../index.html" class="nav-item" target="_blank">
+                    <i class="fas fa-home"></i> 项目导航
+                </a>
+                <a href="../../blog.html" class="nav-item">
+                    <i class="fas fa-blog"></i> 博客首页
+                </a>
+            </div>
+        </header>
+
+        <div class="blog-layout">
+            <aside class="sidebar">
+                <div class="widget">
+                    <h3 class="widget-title">关于我</h3>
+                    <p>一名热爱技术的前端开发者，专注于Web技术的研究与实践，喜欢分享开发经验和心得。</p>
+                </div>
+
+                <div class="widget">
+                    <h3 class="widget-title">最新文章</h3>
+                    <ul class="recent-posts">
+                        <li><a href="../../articles/learning-new-tech.html" class="recent-post-link">学习新技术的心路历程</a></li>
+                        <li><a href="../../articles/frontend-best-practices.html" class="recent-post-link">前端开发中的最佳实践</a></li>
+                        <li><a href="../../articles/tech-docs/network-system-management-initialization.html" class="recent-post-link">网络系统管理 - 初始化配置</a></li>
+                        <li><a href="../../articles/tech-docs/ukui-installation.html" class="recent-post-link">安装 UKUI 图形界面</a></li>
+                    </ul>
+                </div>
+
+                <div class="widget">
+                    <h3 class="widget-title">分类</h3>
+                    <ul class="categories">
+                        <li><a href="../../blog.html" class="category-link">技术分享</a></li>
+                        <li><a href="../../blog.html" class="category-link">学习笔记</a></li>
+                        <li><a href="../../blog.html" class="category-link">项目经验</a></li>
+                        <li><a href="../../blog.html" class="category-link">生活感悟</a></li>
+                    </ul>
+                </div>
+
+                <div class="widget">
+                    <h3 class="widget-title">时间问候</h3>
+                    <p id="time">您好！今天是美好的一天</p>
+                    <p id="runtime">本站已运行: 0 天 0 小时 0 分 0 秒</p>
+                </div>
+            </aside>
+
+            <main class="main-content">
+                <article class="post">
+                    <header class="post-header">
+                        <h1 class="post-title">安装 UKUI 图形界面</h1>
+                        <div class="post-meta">
+                            <span><i class="far fa-calendar"></i> 2026-01-30</span>
+                            <span><i class="far fa-folder"></i> 技术文档</span>
+                            <span><i class="far fa-clock"></i> 5分钟阅读</span>
+                        </div>
+                    </header>
+                    
+                    <div class="post-content">
+                        <p>以下是几种在 openEuler 操作系统上安装 GUI 的方法：</p>
+                        <h3>安装 UKUI 图形界面</h3>
+                        <ol>
+                        <li><strong>安装字体文件</strong>：在终端中输入命令 <code>yum groupinstall fonts -y</code>，等待安装完成.</li>
+                        <li><strong>安装 UKUI</strong>：执行命令 <code>yum install ukui -y</code> 进行 UKUI 的安装.</li>
+                        <li><strong>设置默认图形开机</strong>：输入 <code>systemctl set-default graphical.target</code> 设置默认图形界面启动.</li>
+                        <li><strong>重启系统</strong>：使用 <code>reboot</code> 命令重启电脑，即可看到图形界面.</li>
+                        </ol>
+                        <h3>安装深度桌面环境 DDE</h3>
+                        <ol>
+                        <li><strong>更新系统</strong>：在终端输入 <code>dnf update</code>，将系统中所有已安装的软件包更新到最新版本.</li>
+                        <li><strong>安装 DDE</strong>：执行命令 <code>dnf -y install dde</code> 开始下载并安装深度桌面环境，此过程需耐心等待，安装完成后约占2.5G的磁盘空间.</li>
+                        <li><strong>设置默认启动模式</strong>：输入 <code>systemctl set-default graphical.target</code>，将系统默认运行级别设置为图形用户界面模式，然后使用 <code>reboot</code> 命令重启系统，使设置生效.</li>
+                        </ol>
+                        <h3>离线安装 UKUI 图形界面</h3>
+                        <ol>
+                        <li><strong>下载安装镜像和相关依赖</strong>：从官网下载 openEuler 的安装镜像 iso 文件，然后找一台可联网的虚拟机，使用 <code>dnf download --resolve ukui</code> 命令下载 UKUI 及其相关依赖，不同版本的离线包有所不同，需根据实际情况进行下载.</li>
+                        <li><strong>导入 rpm 包并赋权</strong>：使用 ssh 将下载好的 rpm 包导入对应的无 gui 的离线系统中，然后执行命令 <code>chmod 644 *.rpm</code> 给所有 rpm 包赋予权限.</li>
+                        <li><strong>安装 rpm 包</strong>：切换到源路径 <code>/etc/yum.repos.d/</code>，将原有的源文件重命名为 <code>*.repo.bak</code> 以禁用源，避免 dnf 优先连源导致无限等待，接着执行命令 <code>dnf -y install ./*.rpm --skip-broken</code> 进行一键安装.</li>
+                        <li><strong>设置图形化自启动</strong>：执行命令 <code>systemctl set-default graphical.target</code>，将图形化界面设置为默认自启动.</li>
+                        <li><strong>重启系统</strong>：使用 <code>reboot</code> 命令重启系统，完成离线安装图形界面的操作.</li>
+                        </ol>
+                        <hr>
+                        <h3>1. <strong>安装图形界面组件（以UKUI为例）</strong></h3>
+                        <ol>
+                        <li>首先，安装字体文件，在终端中输入命令<code>yum groupinstall fonts -y</code>。这一步是为了确保系统有合适的字体来显示图形界面中的文字等内容。</li>
+                        <li>然后安装UKUI，执行命令<code>yum install ukui -y</code>。安装完成后，图形界面相关的文件和程序就已经在系统中了。</li>
+                        </ol>
+                        <h3>2. <strong>启动图形界面</strong></h3>
+                        <ol>
+                        <li>当你需要启动图形界面时，在终端中输入<code>startx</code>命令。<code>startx</code>命令是一个用于启动X Window系统（图形界面的底层系统）的脚本。它会读取相关的配置文件，启动图形服务器和窗口管理器等组件，从而开启图形界面。</li>
+                        <li>不过要注意，如果你在字符界面下已经启动了一些服务或者程序，启动图形界面后可能会出现资源竞争等情况。而且这种手动启动图形界面的方式，每次启动后只会开启一个图形会话，当你关闭图形界面（例如通过图形界面中的关机或注销选项），系统会回到字符界面，下次需要图形界面时仍要手动执行<code>startx</code>命令。</li>
+                        </ol>
+                    </div>
+                </article>
+
+                <div class="comments-section">
+                    <h3>评论</h3>
+                    <div class="comment-form">
+                        <form id="commentForm">
+                            <div class="form-group">
+                                <label for="name">姓名</label>
+                                <input type="text" id="name" name="name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">邮箱</label>
+                                <input type="email" id="email" name="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="comment">评论</label>
+                                <textarea id="comment" name="comment" required></textarea>
+                            </div>
+                            <button type="submit" class="btn">发表评论</button>
+                        </form>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <footer>
+            <p>© 2025 huidoudour 的博客 | 专注于技术分享与学习心得</p>
+            <p>最后更新: 2026-01-30</p>
+        </footer>
+    </div>
+
+    <script src="../../js/blog.js"></script>
+</body>
+</html>

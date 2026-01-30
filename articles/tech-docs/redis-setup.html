@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>在Kylin/OpenEuler上搭建Redis Cluster集群 - huidoudour 博客</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../css/blog.css">
+    <style>
+        /* 修复代码块超出容器的问题 */
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-x: auto;
+        }
+        code {
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .post-content pre code {
+            max-width: 100%;
+            display: block;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="avatar">
+                <img src="https://github.com/huidoudour.png" alt="GitHub Avatar" onerror="this.src='../../images/avatar.png'; this.onerror=null;">
+            </div>
+            <h1>huidoudour 的博客</h1>
+            <div class="nav-menu">
+                <a href="../../index.html" class="nav-item" target="_blank">
+                    <i class="fas fa-home"></i> 项目导航
+                </a>
+                <a href="../../blog.html" class="nav-item">
+                    <i class="fas fa-blog"></i> 博客首页
+                </a>
+            </div>
+        </header>
+
+        <div class="blog-layout">
+            <aside class="sidebar">
+                <div class="widget">
+                    <h3 class="widget-title">关于我</h3>
+                    <p>一名热爱技术的前端开发者，专注于Web技术的研究与实践，喜欢分享开发经验和心得。</p>
+                </div>
+
+                <div class="widget">
+                    <h3 class="widget-title">最新文章</h3>
+                    <ul class="recent-posts">
+                        <li><a href="../../articles/learning-new-tech.html" class="recent-post-link">学习新技术的心路历程</a></li>
+                        <li><a href="../../articles/frontend-best-practices.html" class="recent-post-link">前端开发中的最佳实践</a></li>
+                        <li><a href="../../articles/tech-docs/network-system-management-initialization.html" class="recent-post-link">网络系统管理 - 初始化配置</a></li>
+                        <li><a href="../../articles/tech-docs/redis-setup.html" class="recent-post-link">在Kylin/OpenEuler上搭建Redis Cluster集群</a></li>
+                    </ul>
+                </div>
+
+                <div class="widget">
+                    <h3 class="widget-title">分类</h3>
+                    <ul class="categories">
+                        <li><a href="../../blog.html" class="category-link">技术分享</a></li>
+                        <li><a href="../../blog.html" class="category-link">学习笔记</a></li>
+                        <li><a href="../../blog.html" class="category-link">项目经验</a></li>
+                        <li><a href="../../blog.html" class="category-link">生活感悟</a></li>
+                    </ul>
+                </div>
+
+                <div class="widget">
+                    <h3 class="widget-title">时间问候</h3>
+                    <p id="time">您好！今天是美好的一天</p>
+                    <p id="runtime">本站已运行: 0 天 0 小时 0 分 0 秒</p>
+                </div>
+            </aside>
+
+            <main class="main-content">
+                <article class="post">
+                    <header class="post-header">
+                        <h1 class="post-title">在Kylin/OpenEuler上搭建Redis Cluster集群</h1>
+                        <div class="post-meta">
+                            <span><i class="far fa-calendar"></i> 2026-01-30</span>
+                            <span><i class="far fa-folder"></i> 技术文档</span>
+                            <span><i class="far fa-clock"></i> 12分钟阅读</span>
+                        </div>
+                    </header>
+                    
+                    <div class="post-content">
+                        <h1>在Kylin/OpenEuler上搭建Redis Cluster集群</h1>
+                        <p>下面是在Kylin或OpenEuler操作系统上搭建Redis Cluster集群的步骤，使用端口8001-8003作为主节点，8004-8006作为从节点。</p>
+                        <h2>1. 安装Redis</h2>
+                        <p>首先在ecs1上安装Redis：</p>
+                        <pre><code class="language-bash"># 更新系统
+sudo yum update -y
+
+# 安装依赖
+sudo yum install -y gcc make tcl
+
+# 下载并解压Redis
+wget http://download.redis.io/releases/redis-6.2.6.tar.gz
+tar xzf redis-6.2.6.tar.gz
+cd redis-6.2.6
+
+# 编译安装
+make
+sudo make install
+
+#安装成功后不会自动复制配置文件，可以手动复制redis文件夹内的redis.conf文件到/etc/</code></pre>
+                        <h2>2. 创建Redis集群配置文件</h2>
+                        <p>创建6个Redis实例的配置文件和目录结构：</p>
+                        <pre><code class="language-bash"># 创建集群目录结构
+for port in {8001..8006}; do
+  sudo mkdir -p /etc/redis/${port}
+  sudo mkdir -p /var/log/redis/${port}
+  sudo mkdir -p /var/lib/redis/${port}
+done</code></pre>
+                        <p>为每个端口创建配置文件：</p>
+                        <pre><code class="language-bash">for port in {8001..8006}; do
+  cat &lt;&lt;EOF | sudo tee /etc/redis/${port}/redis.conf
+port ${port}
+bind 0.0.0.0
+cluster-enabled yes
+cluster-config-file /var/lib/redis/${port}/nodes.conf
+cluster-node-timeout 5000
+appendonly yes
+daemonize yes
+pidfile /var/run/redis_${port}.pid
+logfile /var/log/redis/${port}/redis.log
+dir /var/lib/redis/${port}
+EOF
+done</code></pre>
+                        <h2>3. 启动Redis实例</h2>
+                        <p>启动所有Redis实例：</p>
+                        <pre><code class="language-bash">for port in {8001..8006}; do
+  redis-server /etc/redis/${port}/redis.conf
+done</code></pre>
+                        <p>验证Redis实例是否正常运行：</p>
+                        <pre><code class="language-bash">ps -ef | grep redis</code></pre>
+                        <h2>4. 创建Redis集群</h2>
+                        <p>使用redis-cli创建集群（3主3从）：</p>
+                        <pre><code class="language-bash">redis-cli --cluster create \
+  127.0.0.1:8001 \
+  127.0.0.1:8002 \
+  127.0.0.1:8003 \
+  127.0.0.1:8004 \
+  127.0.0.1:8005 \
+  127.0.0.1:8006 \
+  --cluster-replicas 1</code></pre>
+                        <p>在提示时输入"yes"确认配置。</p>
+                        <h2>5. 配置防火墙</h2>
+                        <p>允许其他主机访问Redis集群端口：</p>
+                        <pre><code class="language-bash"># 开放Redis集群端口
+for port in {8001..8006}; do
+  sudo firewall-cmd --permanent --add-port=${port}/tcp
+done
+
+# 开放集群总线端口（通常为Redis端口+10000），&lt;可跳过&gt;
+for port in {18001..18006}; do
+  sudo firewall-cmd --permanent --add-port=${port}/tcp
+done
+
+# 重新加载防火墙
+sudo firewall-cmd --reload</code></pre>
+                        <h2>6. 验证集群状态</h2>
+                        <pre><code class="language-bash"># 查看集群节点信息
+redis-cli -p 8001 cluster nodes
+
+# 检查集群健康状态
+redis-cli --cluster check 127.0.0.1:8001
+
+#ping测试
+redis-cli -h &lt;服务器IP&gt; -p &lt;端口&gt; ping
+#批量
+for i in {1..6};do redis-cli -p 800$i -h &lt;服务器IP&gt; ping;done</code></pre>
+                        <h2>7. 从其他主机访问集群</h2>
+                        <p>其他主机可以通过以下方式访问Redis集群：</p>
+                        <ol>
+                        <li>安装Redis客户端：
+                        <pre><code class="language-bash">sudo yum install -y redis</code></pre>
+                        </li>
+                        <li>使用redis-cli连接集群：
+                        <pre><code class="language-bash">redis-cli -c -h &lt;ecs1_IP&gt; -p 8001</code></pre>
+                        </li>
+                        <li>或者在应用程序中使用Redis集群客户端库，配置所有主节点地址。</li>
+                        </ol>
+                        <h2>8. 持久化配置（可选）</h2>
+                        <p>如果需要更可靠的持久化，可以修改配置文件中的以下参数：</p>
+                        <pre><code class="language-conf">appendonly yes
+appendfsync everysec
+save 900 1
+save 300 10
+save 60 10000</code></pre>
+                        <hr>
+                        <h1>Redis多服务器集群创建问题解决</h1>
+                        <p>遇到集群节点长时间无法完成握手（<code>Waiting for the cluster to join</code> 持续显示......）的问题，即使防火墙和网络连通性正常，仍可能有以下原因和解决方案：</p>
+                        <hr>
+                        <h3><strong>1. 常见原因排查</strong></h3>
+                        <h4>1.1 <strong>集群总线端口未开放</strong></h4>
+                        <ul>
+                        <li>Redis Cluster 需要<strong>两个端口</strong>：
+                        <ul>
+                        <li><strong>客户端访问端口</strong>（如8001-8006）</li>
+                        <li><strong>集群总线端口</strong>（客户端端口 + 10000，如18001-18006）</li>
+                        </ul>
+                        </li>
+                        </ul>
+                        <p><strong>检查方法：</strong></p>
+                        <pre><code class="language-bash"># 在所有节点执行
+netstat -tulnp | grep redis
+# 应看到类似输出：
+# tcp  0  0 0.0.0.0:8001  0.0.0.0:*  LISTEN  [redis-server]
+# tcp  0  0 0.0.0.0:18001 0.0.0.0:*  LISTEN  [redis-server]</code></pre>
+                        <p><strong>解决方案：</strong></p>
+                        <pre><code class="language-bash"># 开放总线端口（所有节点执行）
+firewall-cmd --permanent --add-port=18001-18006/tcp
+firewall-cmd --reload</code></pre>
+                        <h4>1.2 <strong>绑定地址配置错误</strong></h4>
+                        <ul>
+                        <li>如果 <code>redis.conf</code> 中 <code>bind</code> 设置为 <code>127.0.0.1</code>，其他节点无法访问</li>
+                        </ul>
+                        <p><strong>检查方法：</strong></p>
+                        <pre><code class="language-bash">grep "^bind" /etc/redis/*.conf
+# 正确应显示：`bind 0.0.0.0` 或服务器实际IP</code></pre>
+                        <p><strong>解决方案：</strong></p>
+                        <p>修改所有节点的配置文件：</p>
+                        <pre><code class="language-bash">sed -i 's/^bind .*/bind 0.0.0.0/g' /etc/redis/*.conf
+redis-cli -p 8001 shutdown
+redis-server /etc/redis/8001.conf</code></pre>
+                        <h4>1.3 <strong>节点间DNS解析问题</strong></h4>
+                        <ul>
+                        <li>如果使用主机名而非IP，需确保所有节点能互相解析</li>
+                        </ul>
+                        <p><strong>测试方法：</strong></p>
+                        <pre><code class="language-bash"># 在server1上测试
+ping 192.168.100.122
+telnet 192.168.100.122 8002
+telnet 192.168.100.122 18002</code></pre>
+                        <hr>
+                        <h3><strong>2. 强制手动修复步骤</strong></h3>
+                        <p>如果等待超时，可以手动完成集群组建：</p>
+                        <h4>2.1 <strong>在所有节点执行集群握手</strong></h4>
+                        <pre><code class="language-bash"># 以 server1 为基准，其他节点加入集群
+redis-cli -p 8001 cluster meet 192.168.100.122 8002
+redis-cli -p 8001 cluster meet 192.168.100.123 8003
+redis-cli -p 8001 cluster meet 192.168.100.124 8004
+redis-cli -p 8001 cluster meet 192.168.100.125 8005
+redis-cli -p 8001 cluster meet 192.168.100.126 8006</code></pre>
+                        <h4>2.2 <strong>验证节点状态</strong></h4>
+                        <pre><code class="language-bash">redis-cli -p 8001 cluster nodes
+# 应看到所有节点状态为 `connected`</code></pre>
+                        <h4>2.3 <strong>手动分配主从关系</strong></h4>
+                        <p>如果自动分配失败，需手动执行：</p>
+                        <pre><code class="language-bash"># 设置从节点（在从节点服务器上执行）
+redis-cli -p 8004 cluster replicate aeb9e84bac8ec4b41334aabb1cb87359995e607d  # 8004 -&gt; 8003
+redis-cli -p 8005 cluster replicate a259a2db1f8a6a772bebefe61057608db841fab2  # 8005 -&gt; 8001
+redis-cli -p 8006 cluster replicate 4f37749bf44931e65e5137cb39f6970f14430034  # 8006 -&gt; 8002</code></pre>
+                        <hr>
+                        <h3><strong>3. 关键配置检查项</strong></h3>
+                        <p>在所有节点的 <code>redis.conf</code> 中确认：</p>
+                        <pre><code class="language-ini">cluster-enabled yes
+cluster-config-file nodes.conf
+cluster-node-timeout 15000  # 可适当增大超时时间
+bind 0.0.0.0
+protected-mode no  # 如果未设置密码，需关闭保护模式</code></pre>
+                        <hr>
+                        <h3><strong>4. 日志分析</strong></h3>
+                        <p>查看具体错误原因：</p>
+                        <pre><code class="language-bash"># 在所有节点检查日志
+tail -n 100 /var/log/redis/8001.log
+# 重点关注以下错误：
+# - Connection refused
+# - Failed cluster meeting
+# - Can't communicate with peer</code></pre>
+                        <hr>
+                        <h3><strong>5. 快速重建集群</strong></h3>
+                        <p>如果问题持续，彻底清理后重建：</p>
+                        <pre><code class="language-bash"># 所有节点执行：
+redis-cli -p 8001 shutdown
+rm -f /var/lib/redis/nodes*.conf
+redis-server /etc/redis/8001.conf</code></pre>
+                        <p>然后重新执行集群创建命令。</p>
+                        <hr>
+                        <h3><strong>6. 网络层深度检查</strong></h3>
+                        <p>如果仍失败，进行底层网络测试：</p>
+                        <pre><code class="language-bash"># 在server1上对其他节点执行：
+for ip in 192.168.100.{122..126}; do
+  echo "Testing $ip:"
+  tcping $ip 8001
+  tcping $ip 18001
+done</code></pre>
+                        <p>（需先安装 <code>tcping</code>：<code>yum install tcping</code>）</p>
+                        <hr>
+                        <p>通过以上步骤，90%的集群握手问题可以解决。如果仍卡住，可能是网络设备（如交换机ACL）限制了节点间通信，需联系网络管理员检查。</p>
+                    </div>
+                </article>
+
+                <div class="comments-section">
+                    <h3>评论</h3>
+                    <div class="comment-form">
+                        <form id="commentForm">
+                            <div class="form-group">
+                                <label for="name">姓名</label>
+                                <input type="text" id="name" name="name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">邮箱</label>
+                                <input type="email" id="email" name="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="comment">评论</label>
+                                <textarea id="comment" name="comment" required></textarea>
+                            </div>
+                            <button type="submit" class="btn">发表评论</button>
+                        </form>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <footer>
+            <p>© 2025 huidoudour 的博客 | 专注于技术分享与学习心得</p>
+            <p>最后更新: 2026-01-30</p>
+        </footer>
+    </div>
+
+    <script src="../../js/blog.js"></script>
+</body>
+</html>
