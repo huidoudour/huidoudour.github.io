@@ -6,6 +6,23 @@
     <title>huidoudour 博客</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="./css/blog.css">
+    <style>
+        /* 修复代码块超出容器的问题 */
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-x: auto;
+        }
+        code {
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .post-content pre code {
+            max-width: 100%;
+            display: block;
+            overflow-x: auto;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -21,7 +38,7 @@
         </header>
 
         <div class="nav-menu">
-            <a href="./index.html" class="nav-item">
+            <a href="./index.html" class="nav-item" target="_blank">
                 <i class="fas fa-home"></i> 项目导航
             </a>
             <a href="./blog.html" class="nav-item">
@@ -39,10 +56,10 @@
                 <div class="widget">
                     <h3 class="widget-title">最新文章</h3>
                     <ul class="recent-posts">
-                        <li><a href="#" class="recent-post-link">学习新技术的心路历程</a></li>
-                        <li><a href="#" class="recent-post-link">项目开发中的架构设计</a></li>
-                        <li><a href="#" class="recent-post-link">Git 使用技巧与工作流</a></li>
-                        <li><a href="#" class="recent-post-link">性能优化实战案例</a></li>
+                        <li><a href="./articles/learning-new-tech.html" class="recent-post-link" target="_blank">学习新技术的心路历程</a></li>
+                        <li><a href="./articles/frontend-best-practices.html" class="recent-post-link" target="_blank">前端开发中的最佳实践</a></li>
+                        <li><a href="./articles/tech-docs/xinchuang-notes.html" class="recent-post-link" target="_blank">信创样题笔记</a></li>
+                        <li><a href="./articles/tech-docs/redis-setup.html" class="recent-post-link" target="_blank">在Kylin/OpenEuler上搭建Redis Cluster集群</a></li>
                     </ul>
                 </div>
 
@@ -70,6 +87,75 @@
 
                 <div class="blog-posts" id="blogPosts">
                     <!-- 博客文章将通过JavaScript动态生成 -->
+                    <div class="blog-post">
+                        <h2 class="post-title">
+                            <a href="./articles/tech-docs/network-system-management-initialization.html" target="_blank">网络系统管理 - 初始化配置</a>
+                        </h2>
+                        <div class="post-meta">
+                            <span class="post-date"><i class="far fa-calendar"></i> 2026-01-30</span>
+                            <span class="post-category"><i class="far fa-folder"></i> 技术文档</span>
+                        </div>
+                        <div class="post-excerpt">
+                            <p>本文介绍了网络系统管理的初始化配置，包括系统安装、CentOS和UOS本地源配置、SSH配置以及服务配置等关键步骤...</p>
+                        </div>
+                        <a href="./articles/tech-docs/network-system-management-initialization.html" class="read-more" target="_blank">阅读全文 <i class="fas fa-arrow-right"></i></a>
+                    </div>
+
+                    <div class="blog-post">
+                        <h2 class="post-title">
+                            <a href="./articles/tech-docs/network-system-management-routersrv.html" target="_blank">网络系统管理 - RouterSrv配置</a>
+                        </h2>
+                        <div class="post-meta">
+                            <span class="post-date"><i class="far fa-calendar"></i> 2026-01-30</span>
+                            <span class="post-category"><i class="far fa-folder"></i> 技术文档</span>
+                        </div>
+                        <div class="post-excerpt">
+                            <p>本文介绍了RouterSrv的配置，包括路由转发、IPTABLES配置、SNAT/DNAT设置以及DHCP、DHCP relay和WEB服务的配置...</p>
+                        </div>
+                        <a href="./articles/tech-docs/network-system-management-routersrv.html" class="read-more" target="_blank">阅读全文 <i class="fas fa-arrow-right"></i></a>
+                    </div>
+
+                    <div class="blog-post">
+                        <h2 class="post-title">
+                            <a href="./articles/tech-docs/xinchuang-notes.html" target="_blank">信创样题笔记</a>
+                        </h2>
+                        <div class="post-meta">
+                            <span class="post-date"><i class="far fa-calendar"></i> 2026-01-30</span>
+                            <span class="post-category"><i class="far fa-folder"></i> 技术文档</span>
+                        </div>
+                        <div class="post-excerpt">
+                            <p>本文整理了信创样题的相关笔记，涵盖了DNS服务、Apache服务、Nginx服务、MySQL服务、Redis服务、NFS服务、Ansible服务、Opengauss服务等多个技术领域的配置要点...</p>
+                        </div>
+                        <a href="./articles/tech-docs/xinchuang-notes.html" class="read-more" target="_blank">阅读全文 <i class="fas fa-arrow-right"></i></a>
+                    </div>
+
+                    <div class="blog-post">
+                        <h2 class="post-title">
+                            <a href="./articles/tech-docs/redis-setup.html" target="_blank">在Kylin/OpenEuler上搭建Redis Cluster集群</a>
+                        </h2>
+                        <div class="post-meta">
+                            <span class="post-date"><i class="far fa-calendar"></i> 2026-01-30</span>
+                            <span class="post-category"><i class="far fa-folder"></i> 技术文档</span>
+                        </div>
+                        <div class="post-excerpt">
+                            <p>详细介绍如何在Kylin或OpenEuler操作系统上搭建Redis Cluster集群，使用端口8001-8003作为主节点，8004-8006作为从节点...</p>
+                        </div>
+                        <a href="./articles/tech-docs/redis-setup.html" class="read-more" target="_blank">阅读全文 <i class="fas fa-arrow-right"></i></a>
+                    </div>
+
+                    <div class="blog-post">
+                        <h2 class="post-title">
+                            <a href="./articles/tech-docs/ukui-installation.html" target="_blank">安装 UKUI 图形界面</a>
+                        </h2>
+                        <div class="post-meta">
+                            <span class="post-date"><i class="far fa-calendar"></i> 2026-01-30</span>
+                            <span class="post-category"><i class="far fa-folder"></i> 技术文档</span>
+                        </div>
+                        <div class="post-excerpt">
+                            <p>介绍在openEuler操作系统上安装UKUI图形界面的方法，包括在线安装、离线安装等多种方式...</p>
+                        </div>
+                        <a href="./articles/tech-docs/ukui-installation.html" class="read-more" target="_blank">阅读全文 <i class="fas fa-arrow-right"></i></a>
+                    </div>
                 </div>
             </main>
         </div>

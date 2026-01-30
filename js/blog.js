@@ -303,21 +303,12 @@ window.addEventListener('load', function() {
     });
 });
 
-// 添加搜索功能
+// 搜索功能
 function initSearch() {
-    const searchContainer = document.querySelector('.search-box');
-    if(searchContainer) {
-        // 创建搜索输入框
-        const searchInput = document.createElement('div');
-        searchInput.className = 'search-box';
-        searchInput.innerHTML = `
-            <i class="fas fa-search"></i>
-            <input type="text" id="searchInput" placeholder="搜索文章...">
-        `;
-        searchContainer.parentNode.insertBefore(searchInput, searchContainer.nextSibling);
-        
+    const searchInput = document.getElementById('searchInput');
+    if(searchInput) {
         // 添加搜索功能
-        document.getElementById('searchInput').addEventListener('input', function(e) {
+        searchInput.addEventListener('input', function(e) {
             const searchTerm = e.target.value.toLowerCase();
             const posts = document.querySelectorAll('.blog-post');
             
