@@ -259,4 +259,82 @@ window.addEventListener('DOMContentLoaded', function() {
             categoriesList.appendChild(listItem);
         });
     }
+    
+    // 初始化返回顶部按钮
+    initBackToTopButton();
 });
+
+// 初始化返回顶部按钮
+function initBackToTopButton() {
+    // 创建返回顶部按钮
+    const backToTopBtn = document.createElement('div');
+    backToTopBtn.className = 'back-to-top';
+    backToTopBtn.innerHTML = '<i class="fas fa-arrow-up"></i>';
+    backToTopBtn.title = '返回顶部';
+    document.body.appendChild(backToTopBtn);
+    
+    // 监听滚动事件
+    window.addEventListener('scroll', function() {
+        if (window.pageYOffset > 300) {
+            backToTopBtn.classList.add('show');
+        } else {
+            backToTopBtn.classList.remove('show');
+        }
+    });
+    
+    // 点击返回顶部
+    backToTopBtn.addEventListener('click', function() {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+}
+
+// 添加页面加载完成后的动画效果
+window.addEventListener('load', function() {
+    // 触发所有卡片的动画
+    const cards = document.querySelectorAll('.blog-post');
+    cards.forEach((card, index) => {
+        setTimeout(() => {
+            card.style.animationDelay = `${index * 0.1}s`;
+            card.style.opacity = '1';
+        }, 100);
+    });
+});
+
+// 添加搜索功能
+function initSearch() {
+    const searchContainer = document.querySelector('.search-box');
+    if(searchContainer) {
+        // 创建搜索输入框
+        const searchInput = document.createElement('div');
+        searchInput.className = 'search-box';
+        searchInput.innerHTML = `
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="搜索文章...">
+        `;
+        searchContainer.parentNode.insertBefore(searchInput, searchContainer.nextSibling);
+        
+        // 添加搜索功能
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const posts = document.querySelectorAll('.blog-post');
+            
+            posts.forEach(post => {
+                const title = post.querySelector('.post-title a').textContent.toLowerCase();
+                const excerpt = post.querySelector('.post-excerpt').textContent.toLowerCase();
+                const tags = Array.from(post.querySelectorAll('.tag')).map(tag => tag.textContent.toLowerCase());
+                
+                if(title.includes(searchTerm) || excerpt.includes(searchTerm) || tags.some(tag => tag.includes(searchTerm))) {
+                    post.style.display = 'block';
+                } else {
+                    post.style.display = 'none';
+                }
+            });
+        });
+    }
+}
+
+// 初始化搜索功能
+document.addEventListener('DOMContentLoaded', initSearch);

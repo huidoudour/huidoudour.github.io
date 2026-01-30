@@ -72,9 +72,39 @@ document.addEventListener('DOMContentLoaded', function() {
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
     document.getElementById('currentDate').textContent = now.toLocaleDateString('zh-CN', options);
     
+    // 初始化返回顶部按钮
+    initBackToTopButton();
+    
     // 可选：使用GitHub API获取更多仓库信息
     // fetchGitHubRepos();
 });
+
+// 初始化返回顶部按钮
+function initBackToTopButton() {
+    // 创建返回顶部按钮
+    const backToTopBtn = document.createElement('div');
+    backToTopBtn.className = 'back-to-top';
+    backToTopBtn.innerHTML = '<i class="fas fa-arrow-up"></i>';
+    backToTopBtn.title = '返回顶部';
+    document.body.appendChild(backToTopBtn);
+    
+    // 监听滚动事件
+    window.addEventListener('scroll', function() {
+        if (window.pageYOffset > 300) {
+            backToTopBtn.classList.add('show');
+        } else {
+            backToTopBtn.classList.remove('show');
+        }
+    });
+    
+    // 点击返回顶部
+    backToTopBtn.addEventListener('click', function() {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+}
 
 // 可选：使用GitHub API获取仓库详细信息
 async function fetchGitHubRepos() {
@@ -132,4 +162,16 @@ document.addEventListener('click', function(e) {
             }, 1000);
         }, 10);
     }
+});
+
+// 添加页面加载完成后的动画效果
+window.addEventListener('load', function() {
+    // 触发所有卡片的动画
+    const cards = document.querySelectorAll('.repo-card');
+    cards.forEach((card, index) => {
+        setTimeout(() => {
+            card.style.animationDelay = `${index * 0.1}s`;
+            card.style.opacity = '1';
+        }, 100);
+    });
 });
