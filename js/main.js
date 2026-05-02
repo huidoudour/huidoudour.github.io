@@ -59,7 +59,7 @@ const repositories = [
     {
         name: "SaveCopy",
         fullName: "huidoudour/SaveCopy",
-        description: "Forked from RikkaApps/SaveCopy。简单的Android应用，处理ACTION_VIEW、ACTION_SEND、ACTION_SEND_MULTIPLE，保存文件副本。适用于那些只允许打开文件的不友好应用。",
+        description: "简单的Android应用，处理ACTION_VIEW、ACTION_SEND、ACTION_SEND_MULTIPLE，保存文件副本。适用于那些只允许打开文件的不友好应用。",
         icon: "fas fa-save",
         url: "https://github.com/huidoudour/SaveCopy"
     }
@@ -74,11 +74,22 @@ document.addEventListener('DOMContentLoaded', function() {
         const repoCard = document.createElement('div');
         repoCard.className = 'repo-card';
         
+        // 为SaveCopy添加特殊标题
+        let titleHtml = `<h3 class="repo-name">${repo.name}</h3>`;
+        if (repo.name === "SaveCopy") {
+            titleHtml = `
+                <h3 class="repo-name">
+                    ${repo.name}
+                    <span class="forked-from">Forked from <a href="https://github.com/RikkaApps/SaveCopy" target="_blank" class="forked-link">RikkaApps/SaveCopy</a></span>
+                </h3>
+            `;
+        }
+        
         repoCard.innerHTML = `
             <div class="repo-icon">
                 <i class="${repo.icon}"></i>
             </div>
-            <h3 class="repo-name">${repo.name}</h3>
+            ${titleHtml}
             <p class="repo-desc">${repo.description}</p>
             <a href="${repo.url}" target="_blank" class="repo-link">
                 <i class="fab fa-github"></i> 访问页面 
