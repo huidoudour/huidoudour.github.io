@@ -19,14 +19,14 @@ const repositories = [
         fullName: "huidoudour/CodeScan",
         description: "一个二维码和条形码扫描记录小工具。",
         icon: "fas fa-qrcode",
-        url: "https://www.ccrh-cmit.uno/CodeScan/"
+        url: "https://scan.ccrh-cmit.uno"
     },
     {
         name: "Event",
         fullName: "huidoudour/Event",
         description: "轻量级记事本应用，支持快速记录和管理日常事项。",
         icon: "fas fa-sticky-note",
-        url: "https://github.com/huidoudour/Event/releases"
+        url: "https://event.ccrh-cmit.uno"
     },
     {
         name: "Learn-of-all",
