@@ -22,6 +22,13 @@ const repositories = [
         url: "https://www.ccrh-cmit.uno/CodeScan/"
     },
     {
+        name: "Event",
+        fullName: "huidoudour/Event",
+        description: "轻量级记事本应用，支持快速记录和管理日常事项。",
+        icon: "fas fa-sticky-note",
+        url: "https://github.com/huidoudour/Event/releases"
+    },
+    {
         name: "Learn-of-all",
         fullName: "huidoudour/Learn-of-all",
         description: "综合性学习项目，涵盖多种技术和知识领域的学习资料和示例。",
@@ -41,6 +48,20 @@ const repositories = [
         description: "欧拉计划(Project Euler)学习项目，包含多种编程语言的解题方案。",
         icon: "fas fa-code",
         url: "https://euler.ccrh-cmit.uno"
+    },
+    {
+        name: "exdd-in",
+        fullName: "huidoudour/exdd-in",
+        description: "Excel加载项项目，仅供学习加载项开发使用。",
+        icon: "fas fa-file-excel",
+        url: "https://github.com/huidoudour/exdd-in"
+    },
+    {
+        name: "SaveCopy",
+        fullName: "huidoudour/SaveCopy",
+        description: "Forked from RikkaApps/SaveCopy。简单的Android应用，处理ACTION_VIEW、ACTION_SEND、ACTION_SEND_MULTIPLE，保存文件副本。适用于那些只允许打开文件的不友好应用。",
+        icon: "fas fa-save",
+        url: "https://github.com/huidoudour/SaveCopy"
     }
 ];
 

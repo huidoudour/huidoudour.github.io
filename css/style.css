@@ -7,26 +7,53 @@
 }
 
 :root {
-    --primary-color: #24292e;
-    --secondary-color: #0366d6;
-    --accent-color: #2ea44f;
-    --light-color: #f6f8fa;
+    --primary-color: #4facfe;
+    --secondary-color: #00f2fe;
+    --accent-color: #43e97b;
+    --dark-color: #2d3436;
+    --light-color: #f5f6fa;
+    --glass-color: rgba(255, 255, 255, 0.15);
+    --text-color: #2d3436;
+    --text-light: #636e72;
     --card-bg: #ffffff;
     --shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
     --transition: all 0.3s ease;
-    --gradient-start: #2c3e50;
-    --gradient-end: #4a6491;
-    --accent-gradient: linear-gradient(to right, #36d1dc, #5b86e5);
 }
 
 body {
-    background-color: #f9f9f9;
-    color: #333;
+    font-family: 'Poppins', 'Segoe UI', 'Microsoft YaHei', sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    background: -webkit-linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    color: var(--text-color);
     line-height: 1.6;
     min-height: 100vh;
     padding: 20px;
-    background-image: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
-    background-attachment: fixed;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Background Animation */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background: linear-gradient(-45deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #54a0ff, #5f27cd, #01a3a4, #f368e0, #ff6348, #7bed9f);
+    background: -webkit-linear-gradient(-45deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #54a0ff, #5f27cd, #01a3a4, #f368e0, #ff6348, #7bed9f);
+    background-size: 400% 400%;
+    -webkit-background-size: 400% 400%;
+    animation: gradient 30s ease infinite;
+    -webkit-animation: gradient 30s ease infinite;
+    opacity: 0.7;
+}
+
+@keyframes gradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
 }
 
 .container {
@@ -40,8 +67,11 @@ header {
     margin-bottom: 40px;
     padding: 30px 20px;
     border-radius: 12px;
-    background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-    color: white;
+    background: var(--glass-color);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--dark-color);
     box-shadow: var(--shadow);
     position: relative;
     overflow: hidden;
@@ -55,14 +85,14 @@ header::before {
     left: 0;
     right: 0;
     height: 4px;
-    background: linear-gradient(to right, #fdc830, #f37335);
+    background: #667eea;
 }
 
 .avatar {
     width: 120px;
     height: 120px;
     border-radius: 50%;
-    border: 5px solid rgba(255, 255, 255, 0.2);
+    border: 5px solid rgba(255, 255, 255, 0.3);
     margin: 0 auto 20px;
     background-color: #fff;
     display: flex;
@@ -105,19 +135,21 @@ h1 {
     align-items: center;
     gap: 8px;
     margin-top: 15px;
-    color: white;
+    color: var(--dark-color);
     text-decoration: none;
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.3);
     padding: 8px 16px;
     border-radius: 30px;
     transition: var(--transition);
     animation: fadeInUp 1.2s ease-out;
+    border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .github-link:hover {
-    background: rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.5);
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    color: var(--primary-color);
 }
 
 .intro {
@@ -138,12 +170,14 @@ h1 {
 }
 
 .repo-card {
-    background: var(--card-bg);
-    border-radius: 12px;
+    background: var(--glass-color);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
     padding: 25px;
-    box-shadow: var(--shadow);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     transition: var(--transition);
-    border: 1px solid #e1e4e8;
     display: flex;
     flex-direction: column;
     height: 100%;
@@ -151,6 +185,24 @@ h1 {
     overflow: hidden;
     animation: fadeInUp 0.6s ease forwards;
     opacity: 0;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.repo-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    z-index: 0;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
 }
 
 .repo-card::after {
@@ -160,15 +212,30 @@ h1 {
     left: 0;
     width: 100%;
     height: 4px;
-    background: var(--accent-gradient);
+    background: #667eea;
     transform: scaleX(0);
+    -webkit-transform: scaleX(0);
     transition: transform 0.4s ease;
+    -webkit-transition: transform 0.4s ease;
     transform-origin: left;
+    -webkit-transform-origin: left;
+    z-index: 1;
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% center; }
+    50% { background-position: 100% center; }
+    100% { background-position: 0% center; }
 }
 
 .repo-card:hover {
     transform: translateY(-8px);
-    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 15px 40px rgba(102, 126, 234, 0.2);
+    border-color: rgba(102, 126, 234, 0.3);
+}
+
+.repo-card:hover::before {
+    opacity: 1;
 }
 
 .repo-card:hover::after {
@@ -176,15 +243,24 @@ h1 {
 }
 
 .repo-icon {
-    font-size: 2.5rem;
-    color: var(--secondary-color);
+    font-size: 2.8rem;
+    color: var(--primary-color);
     margin-bottom: 15px;
+    position: relative;
+    z-index: 1;
 }
 
 .repo-name {
     font-size: 1.5rem;
     font-weight: 600;
     margin-bottom: 10px;
+    color: var(--dark-color);
+    position: relative;
+    z-index: 1;
+    transition: color 0.3s ease;
+}
+
+.repo-card:hover .repo-name {
     color: var(--primary-color);
 }
 
@@ -193,6 +269,8 @@ h1 {
     margin-bottom: 20px;
     flex-grow: 1;
     line-height: 1.6;
+    position: relative;
+    z-index: 1;
 }
 
 .repo-link {
@@ -200,22 +278,27 @@ h1 {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    background: var(--secondary-color);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    background: -webkit-linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
     color: white;
     text-decoration: none;
     padding: 12px 20px;
-    border-radius: 6px;
+    border-radius: 8px;
     font-weight: 500;
     transition: var(--transition);
     width: 100%;
     text-align: center;
     margin-top: auto;
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
 }
 
 .repo-link:hover {
-    background: #0251b8;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(3, 102, 214, 0.3);
+    background: linear-gradient(135deg, #764ba2 0%, #f093fb 50%, #f5576c 100%);
+    background: -webkit-linear-gradient(135deg, #764ba2 0%, #f093fb 50%, #f5576c 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(118, 75, 162, 0.4);
 }
 
 footer {
@@ -238,24 +321,32 @@ footer {
 }
 
 .stat-item {
-    background: white;
-    padding: 15px 25px;
-    border-radius: 8px;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+    background: var(--glass-color);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 20px 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     min-width: 150px;
     text-align: center;
     transition: var(--transition);
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
 .stat-item:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 12px 40px rgba(79, 172, 254, 0.2);
+    border-color: rgba(79, 172, 254, 0.3);
 }
 
 .stat-number {
     font-size: 2rem;
     font-weight: 700;
-    color: var(--secondary-color);
+    color: var(--primary-color);
     display: block;
 }
 
@@ -293,7 +384,7 @@ footer {
 .nav-item:hover {
     transform: translateY(-5px);
     box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-    background: var(--secondary-color);
+    background: var(--primary-color);
     color: white;
 }
 
@@ -365,12 +456,20 @@ footer {
     100% { transform: translateY(0px); }
 }
 
+@keyframes rotateGradient {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
 .repo-card:nth-child(1) { animation-delay: 0.1s; }
 .repo-card:nth-child(2) { animation-delay: 0.2s; }
 .repo-card:nth-child(3) { animation-delay: 0.3s; }
 .repo-card:nth-child(4) { animation-delay: 0.4s; }
 .repo-card:nth-child(5) { animation-delay: 0.5s; }
 .repo-card:nth-child(6) { animation-delay: 0.6s; }
+.repo-card:nth-child(7) { animation-delay: 0.7s; }
+.repo-card:nth-child(8) { animation-delay: 0.8s; }
+.repo-card:nth-child(9) { animation-delay: 0.9s; }
 
 /* 滚动条样式 */
 ::-webkit-scrollbar {
@@ -397,7 +496,7 @@ footer {
     right: 30px;
     width: 50px;
     height: 50px;
-    background: var(--secondary-color);
+    background: var(--primary-color);
     color: white;
     border-radius: 50%;
     display: flex;
@@ -417,6 +516,6 @@ footer {
 }
 
 .back-to-top:hover {
-    background: #0251b8;
+    background: var(--secondary-color);
     transform: translateY(-2px);
 }
